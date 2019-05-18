@@ -2,7 +2,6 @@ package messaging;
 
 import java.nio.ByteBuffer;
 
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -10,6 +9,8 @@ import com.google.gson.JsonElement;
 import messaging.exceptions.InjuredPackageException;
 
 public class PackageGetter {
+	
+	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	
 	private byte bMagic;
 	private byte bSrc;
@@ -19,7 +20,6 @@ public class PackageGetter {
 	private int bUserId;
 	private String messageString;
 	private JsonElement messageJson;
-	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	
 	public PackageGetter(byte[] wholeMessage) throws InjuredPackageException {
 		PackageChecker check =new PackageChecker(wholeMessage);
@@ -98,7 +98,7 @@ public class PackageGetter {
 	}
 	
 	public String toString() {
-		return new String("begining of package = "+bMagic+"\nsrc = "+bSrc+"\nnumber of the message = "+bPktId+"\nlength of the message = "+wLen
-				+"\ntype of the commad = "+cType+"\nuserId = "+bUserId+"\nmessage = "+messageString);
+		return new String("Description of the package: \nbegining of package = "+bMagic+"\nsrc = "+bSrc+"\nnumber of the message = "+bPktId
+				+"\nlength of the message = "+wLen+"\ntype of the commad = "+cType+"\nuserId = "+bUserId+"\nmessage = "+messageString);
 	}
 }
