@@ -7,6 +7,7 @@ public class PackageChecker {
   private boolean correctContent;
   
 	public PackageChecker(byte[] message) {
+		if(message == null) throw new NullPointerException();
 		
 		byte[] firstCheck = new byte[14];
 		byte[] secondCheck = new byte[message.length-4-14];

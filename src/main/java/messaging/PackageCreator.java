@@ -17,11 +17,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 
+import messaging.exceptions.ArgumentException;
 import messaging.exceptions.NoMessageException;
 
 public class PackageCreator {
 
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+	private static final String algoritm = "DES";
 	private static Key key;
 	private static Cipher cipher;
 	
@@ -45,9 +47,11 @@ public class PackageCreator {
 	private byte[] wholePackage;
 	
 	
-	public PackageCreator( byte src, int commandType, int userId, JsonElement jsonMessage) throws NoMessageException {
-		if(jsonMessage == null) throw new NoMessageException();
+	public PackageCreator( byte src, int commandType, int userId, JsonElement jsonMessage) 
+			throws NoMessageException, ArgumentException, Exception {
+		if(jsonMessage == null) throw new NullPointerException();
 		String inputMessage = GSON.toJson(jsonMessage);
+		if(src<0 || commandType<0 || userId<0) throw new ArgumentException();
 		
 		message = encryptMessage(inputMessage);
 		if(message.length==0) throw new NoMessageException("Can`t send an empty string");
@@ -60,6 +64,8 @@ public class PackageCreator {
 		
 		//augment message number
 		bPktIdLong++;
+		if(bPktIdLong<0) throw new Exception("Can`t create message any more");
+		
 		ByteBuffer buf = ByteBuffer.allocate(8);
 		buf.putLong(bPktIdLong);
 		bPktId = buf.array();
@@ -169,7 +175,7 @@ public class PackageCreator {
 	private static void initializeCipher() {
 		if(cipher==null) {
 			try {
-				 cipher = Cipher.getInstance("DES");
+				 cipher = Cipher.getInstance(algoritm);
 			} catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
 				e.printStackTrace();
 			}
@@ -179,7 +185,7 @@ public class PackageCreator {
 	private static void initializeKey() {
 		if(key==null) {
 			try {
-		      KeyGenerator keyGen = KeyGenerator.getInstance("DES");
+		      KeyGenerator keyGen = KeyGenerator.getInstance(algoritm);
 		      SecureRandom secRandom = new SecureRandom();
 		      keyGen.init(secRandom);
 		      key = keyGen.generateKey();   

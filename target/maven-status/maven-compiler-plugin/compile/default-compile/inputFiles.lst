@@ -4,4 +4,5 @@ D:\java\messanging\messaging-project\src\main\java\messaging\exceptions\InjuredP
 D:\java\messanging\messaging-project\src\main\java\messaging\App.java
 D:\java\messanging\messaging-project\src\main\java\messaging\CRC16.java
 D:\java\messanging\messaging-project\src\main\java\messaging\exceptions\NoMessageException.java
+D:\java\messanging\messaging-project\src\main\java\messaging\exceptions\ArgumentException.java
 D:\java\messanging\messaging-project\src\main\java\messaging\PackageCreator.java

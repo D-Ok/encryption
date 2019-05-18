@@ -21,7 +21,8 @@ public class PackageGetter {
 	private String messageString;
 	private JsonElement messageJson;
 	
-	public PackageGetter(byte[] wholeMessage) throws InjuredPackageException {
+	public PackageGetter(byte[] wholeMessage) throws InjuredPackageException{
+		if(wholeMessage == null) throw new NullPointerException();
 		PackageChecker check =new PackageChecker(wholeMessage);
 		if(!check.isCorrect()) throw new InjuredPackageException();
 		

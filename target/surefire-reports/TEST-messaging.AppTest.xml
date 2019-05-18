@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite tests="2" failures="0" name="messaging.AppTest" time="0.041" errors="0" skipped="0">
+<testsuite tests="6" failures="0" name="messaging.AppTest" time="0.548" errors="0" skipped="0">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="java.vm.version" value="9.0.4+11"/>
@@ -65,6 +65,10 @@
     <property name="sun.desktop" value="windows"/>
     <property name="sun.cpu.isalist" value="amd64"/>
   </properties>
-  <testcase classname="messaging.AppTest" name="testHex" time="0.041"/>
-  <testcase classname="messaging.AppTest" name="testLength" time="0"/>
+  <testcase classname="messaging.AppTest" name="testGetterIfNull" time="0.087"/>
+  <testcase classname="messaging.AppTest" name="testChecker" time="0.412"/>
+  <testcase classname="messaging.AppTest" name="testEnlargingNumberOfMessage" time="0.016"/>
+  <testcase classname="messaging.AppTest" name="testCreator" time="0.007"/>
+  <testcase classname="messaging.AppTest" name="testGetter" time="0.026"/>
+  <testcase classname="messaging.AppTest" name="testEncryption" time="0"/>
 </testsuite>

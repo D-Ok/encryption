@@ -8,6 +8,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import messaging.exceptions.ArgumentException;
 import messaging.exceptions.InjuredPackageException;
 import messaging.exceptions.NoMessageException;
 
@@ -27,8 +28,9 @@ public class App {
 		   			jo.add("messages", ja);
 		   			
 		   			byte src = 1;
-		   			createAndGetPackage(src, 4, 145, jo);
-					
+		   			byte[] bytes = createPackage(src, 4, 145, jo);
+		   			getPackageAndPrintInformation(bytes);
+		   			
 		   			src = 8;
 		   			
 		   			jo = new JsonObject();
@@ -36,27 +38,42 @@ public class App {
 		   			jo.addProperty("location", "Kyiv");
 		   			jo.addProperty("message", "useful information");
 		   			
-		   			createAndGetPackage(src, 2, 333, jo);
-		   			
+		   			bytes = createPackage(src, 2, 333, jo);
+		   			getPackageAndPrintInformation(bytes);
+
+		   			bytes = createPackage((byte)3313, 4, 145, jo);
+		   			getPackageAndPrintInformation(bytes);
 		   		
 		   	  }
 		   	  
-		   	  public static void createAndGetPackage(byte src, int commandType, int userId, JsonElement je) {
+		   	  public static PackageGetter getPackageAndPrintInformation(byte[] bytes) { 
+				try {
+					PackageGetter pG = new PackageGetter(bytes);
+					System.out.println(pG.toString());
+					return pG;
+				} catch (InjuredPackageException e) {
+					System.out.println("Package was injured");
+				} catch (NullPointerException e) {
+					System.out.println("Argyment can`t be null");
+				}
+				return null;
+			}
+
+			public static byte[] createPackage(byte src, int commandType, int userId, JsonElement je) {
 		   		try {
 					PackageCreator packege = new PackageCreator( src, commandType, userId, je);
 					byte[] bytes = packege.getWholePackage();
+					return bytes;
 					
-					PackageGetter pG = new PackageGetter(bytes);
-		   			System.out.println(pG.toString());
 				} catch (NoMessageException e) {
-					e.printStackTrace();
-				} catch (InjuredPackageException e) {
-					e.printStackTrace();
+					System.out.println(e.getMessage());
+				} catch (ArgumentException e) {
+					System.out.println("Please, enter correct data");
+				}catch (NullPointerException e) {
+					System.out.println("Argyment can`t be null");
+				} catch (Exception e) {
+					System.out.println(e.getMessage());
 				}
+		   		return null;
 		   	  }
-		   	  
-		       public static String sha256hex(String input) {
-		           return DigestUtils.sha256Hex(input);
-		       }
-		       
 }
