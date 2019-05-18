@@ -1,6 +1,6 @@
 package messaging;
 
-import java.io.UnsupportedEncodingException;
+import java.io.UnsupportedEncodingException; 
 import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -12,6 +12,10 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 
 import messaging.exceptions.NoMessageException;
 
@@ -47,9 +51,11 @@ byte[] bytes = dbuf.array(); // { 0, 1 }
 	
 	private byte[] wholePackage;
 	private byte[] discriptionPart = new byte[14];
+	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	
-	public PackageCreator( byte src, int commandType, int userId, String inputMessage) throws NoMessageException {
-		
+	public PackageCreator( byte src, int commandType, int userId, JsonElement jsonMessage) throws NoMessageException {
+		if(jsonMessage == null) throw new NoMessageException();
+		String inputMessage = GSON.toJson(jsonMessage);
 		try {
 			if(cipher==null) cipher = Cipher.getInstance("DES");
 		} catch (NoSuchAlgorithmException e) {
@@ -150,8 +156,7 @@ byte[] bytes = dbuf.array(); // { 0, 1 }
 		      SecureRandom secRandom = new SecureRandom();
 		      keyGen.init(secRandom);
 		      key = keyGen.generateKey();   
-			  }
-		      //Cipher cipher = Cipher.getInstance("DES");      
+			  }  
 			  cipher.init(Cipher.ENCRYPT_MODE, key);
 
 			  byte[] plainText  = message.getBytes("UTF-8");
@@ -179,7 +184,6 @@ byte[] bytes = dbuf.array(); // { 0, 1 }
 			byte[] cipherText = cipher.doFinal(mess);
 			return new String(cipherText, "UTF-8");
 		} catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		  return null;

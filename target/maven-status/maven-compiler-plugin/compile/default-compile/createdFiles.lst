@@ -1,1 +1,7 @@
+messaging\PackageCreator.class
+messaging\CRC16.class
+messaging\PackageChecker.class
+messaging\exceptions\InjuredPackageException.class
+messaging\PackageGetter.class
 messaging\App.class
+messaging\exceptions\NoMessageException.class

@@ -1,15 +1,11 @@
 package messaging;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 
 import messaging.exceptions.InjuredPackageException;
 
@@ -21,14 +17,13 @@ public class PackageGetter {
 	private int wLen;
 	private int cType;
 	private int bUserId;
-	private String message;
+	private String messageString;
+	private JsonElement messageJson;
+	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	
 	public PackageGetter(byte[] wholeMessage) throws InjuredPackageException {
 		PackageChecker check =new PackageChecker(wholeMessage);
 		if(!check.isCorrect()) throw new InjuredPackageException();
-//		byte[] arr = { 0x00, 0x01 };
-//		ByteBuffer wrapped = ByteBuffer.wrap(arr); // big-endian by default
-//		short num = wrapped.getShort(); // 1
 		
 		bMagic=wholeMessage[0];
 		bSrc=wholeMessage[1];
@@ -65,8 +60,8 @@ public class PackageGetter {
 			}
 			 
 		}
-		message = PackageCreator.decryptMessage(mess);   
-	     
+		messageString = PackageCreator.decryptMessage(mess);   
+	    messageJson = GSON.fromJson(messageString, JsonElement.class );
 		  
 	}
 
@@ -94,7 +89,16 @@ public class PackageGetter {
 		return bUserId;
 	}
 
-	public String getMessage() {
-		return message;
+	public JsonElement getMessageJson() {
+		return messageJson;
+	}
+	
+	public String getMessageString() {
+		return messageString;
+	}
+	
+	public String toString() {
+		return new String("begining of package = "+bMagic+"\nsrc = "+bSrc+"\nnumber of the message = "+bPktId+"\nlength of the message = "+wLen
+				+"\ntype of the commad = "+cType+"\nuserId = "+bUserId+"\nmessage = "+messageString);
 	}
 }
