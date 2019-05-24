@@ -21,7 +21,8 @@ public class Message {
 		this.userId = userId;
 		
 		JsonObject jo = (JsonObject) message;
-		//if(jo.has(nameOfGoods)) nameOfGoods=jo.
+		if(jo.has(nameOfGoods)) nameOfGoods=jo.get(nameOfGoods).getAsString();
+		
 	}
 	
 	

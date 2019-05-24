@@ -1,5 +1,7 @@
 package messaging;
 
+import java.util.Random;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -11,6 +13,11 @@ import messaging.exceptions.NoMessageException;
 public class App {
 
 		   	  public static void main(String[] args) {
+		   		  
+		   		  Random r = new Random();
+		   		  for(int i =0; i<100; i++) {
+		   			  System.out.println(r.nextInt(5));
+		   		  }
 		   	
 		   			JsonArray ja = new JsonArray();
 		   			ja.add("some string");
