@@ -20,7 +20,7 @@ import com.google.gson.JsonElement;
 import messaging.exceptions.ArgumentException;
 import messaging.exceptions.NoMessageException;
 
-public class PackageCreator {
+public class Package {
 
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	private static final String algoritm = "DES";
@@ -47,7 +47,7 @@ public class PackageCreator {
 	private byte[] wholePackage;
 	
 	
-	public PackageCreator( byte src, int commandType, int userId, JsonElement jsonMessage) 
+	public Package( byte src, int commandType, int userId, JsonElement jsonMessage) 
 			throws NoMessageException, ArgumentException, Exception {
 		if(jsonMessage == null) throw new NullPointerException();
 		String inputMessage = GSON.toJson(jsonMessage);

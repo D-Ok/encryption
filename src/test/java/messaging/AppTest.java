@@ -113,9 +113,9 @@ public class AppTest {
     @Test 
     public void testEncryption() {
     	String message = "some information";
-    	byte[] encrypted = PackageCreator.encryptMessage(message);
+    	byte[] encrypted = Package.encryptMessage(message);
     	
-    	Assert.assertEquals(message, PackageCreator.decryptMessage(encrypted));
+    	Assert.assertEquals(message, Package.decryptMessage(encrypted));
     }
 }
 

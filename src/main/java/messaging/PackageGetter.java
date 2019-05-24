@@ -61,7 +61,7 @@ public class PackageGetter {
 			}
 			 
 		}
-		messageString = PackageCreator.decryptMessage(mess);   
+		messageString = Package.decryptMessage(mess);   
 	    messageJson = GSON.fromJson(messageString, JsonElement.class );
 		  
 	}
