@@ -5,8 +5,6 @@ import com.google.gson.JsonObject;
 
 public class Message {
 	
-	enum CommandTypes{ QuontityOfGoods, CellGoods, AddGoods, AddGroup, AddNameOfGoodsToGroup, SetPrice};
-	
 	int cType;
 	int userId;
 	
