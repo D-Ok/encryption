@@ -23,7 +23,7 @@ import messaging.exceptions.NoMessageException;
 public class Package {
 
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-	private static final String algoritm = "DES";
+	private static final String algoritm = "AES";
 	private static Key key;
 	private static Cipher cipher;
 	

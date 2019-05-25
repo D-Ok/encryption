@@ -1,7 +1,7 @@
 package messaging.warehouse;
 
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Warehouse {
 	
@@ -9,11 +9,11 @@ public class Warehouse {
 		AddGroup, AddNameOfGoodsToGroup, SetPrice};
 	
 
-	private HashMap<String, HashSet<Goods>> groups;
+	private ConcurrentHashMap<String, HashSet<Goods>> groups;
 	
-	Warehouse(){
-		groups = new HashMap<String, HashSet<Goods>>();
-		
+	public Warehouse(){
+		groups = new ConcurrentHashMap<String, HashSet<Goods>>();
+
 		HashSet<Goods> hs = new HashSet<Goods>();
 		hs.add(new Goods("buckwheat", 25.5, 1000));
 		hs.add(new Goods("fig", 33, 1500));
