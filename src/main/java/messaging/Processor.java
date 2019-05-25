@@ -3,6 +3,7 @@ package messaging;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import messaging.exceptions.InvalidCharacteristicOfGoodsException;
 import messaging.warehouse.Warehouse;
 
 public class Processor {
@@ -40,15 +41,24 @@ public class Processor {
 			
 			switch (message.getcType()) {
 			case 0:
-				info = "Quantity of "+goods+" in group "+group+": "+warehouse.getQuantityOfGoods(group, goods);
+				info = "Quantity of "+goods+" in the group "+group+": "+warehouse.getQuantityOfGoods(group, goods);
 				break;
 			case 1 :
-				warehouse.removeGoods(group, goods, quantity);
-				info = "Was removed "+goods+" in group "+group+": "+quantity;
+				try {
+					warehouse.removeGoods(group, goods, quantity);
+					info = "Was removed "+goods+" in the group "+group+": "+quantity;
+				} catch (InvalidCharacteristicOfGoodsException e) {
+					info = "Error: "+e.getMessage();
+				}
 				break;
 			case 2:
-				warehouse.addGoods(group, goods, quantity);
-				info = "Was added "+goods+" in group "+group+" quantity: "+quantity;
+				try {
+					warehouse.addGoods(group, goods, quantity);
+					info = "Was added "+goods+" in the group "+group+" quantity: "+quantity;
+				} catch (InvalidCharacteristicOfGoodsException e) {
+					info = "Error: "+e.getMessage();
+				}
+				
 				break;
 			case 3:
 				warehouse.addGroup(group);
@@ -56,11 +66,15 @@ public class Processor {
 				break;
 			case 4:
 				warehouse.addNameOfGoodtToGroup(group, goods);
-				info = "Was added goods with name '"+goods+"' to group "+group;
+				info = "Was added goods with name '"+goods+"' to the group "+group;
 				break;
 			case 5:
-				warehouse.setPrice(group, goods, price);
-				info = "To the "+goods+" in group "+group+" was set price: "+price;
+				try {
+					warehouse.setPrice(group, goods, price);
+					info = "To the "+goods+" in the group "+group+" was set price: "+price;
+				} catch (InvalidCharacteristicOfGoodsException e) {
+					info = "Error: "+e.getMessage();
+				}
 				break;
 			default:
 				break;

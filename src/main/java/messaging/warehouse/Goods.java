@@ -1,5 +1,6 @@
 package messaging.warehouse;
 
+import messaging.exceptions.InvalidCharacteristicOfGoodsException;
 
 public class Goods {
 
@@ -11,7 +12,8 @@ public class Goods {
 		return price;
 	}
 
-	public void setPrice(double price) {
+	public void setPrice(double price) throws InvalidCharacteristicOfGoodsException {
+		if(price<0) throw new InvalidCharacteristicOfGoodsException("Price of goods can`t be less than 0");
 		this.price = price;
 	}
 
@@ -19,7 +21,8 @@ public class Goods {
 		return quantity;
 	}
 
-	public void setQuantity(int quantity) {
+	public void setQuantity(int quantity) throws InvalidCharacteristicOfGoodsException {
+		if(quantity<0) throw new InvalidCharacteristicOfGoodsException("Quantity of goods can`t be less than 0");
 		this.quantity = quantity;
 	}
 
@@ -36,16 +39,12 @@ public class Goods {
 		price = 0.1;
 		quantity = 0;
 	}
-
-	Goods(String name, double price){
-		this.name = name;
-		this.price = price;
-		this.quantity = 0;
-	}
 	
-	Goods(String name, double price, int quantity){
+	Goods(String name, double price, int quantity) throws InvalidCharacteristicOfGoodsException{
 		this.name = name;
-		this.price = price;
+		if(quantity<0 || price<0) throw new InvalidCharacteristicOfGoodsException();
 		this.quantity = quantity;
+		this.price = price;
 	}
+
 }

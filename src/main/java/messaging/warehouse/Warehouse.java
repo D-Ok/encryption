@@ -6,6 +6,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import messaging.exceptions.InvalidCharacteristicOfGoodsException;
+
 
 public class Warehouse {
 	
@@ -19,15 +21,24 @@ public class Warehouse {
 		groups = new ConcurrentHashMap<String, CopyOnWriteArraySet<Goods>>();
 
 		CopyOnWriteArraySet<Goods> hs = new CopyOnWriteArraySet<Goods>();
-		hs.add(new Goods("buckwheat", 25.5, 1000));
-		hs.add(new Goods("fig", 33, 1500));
-		hs.add(new Goods("bulgur", 40, 800));
+		try {
+			hs.add(new Goods("buckwheat", 25.5, 1000));
+			hs.add(new Goods("fig", 33, 1500));
+			hs.add(new Goods("bulgur", 40, 800));
+		} catch (InvalidCharacteristicOfGoodsException e) {
+			e.printStackTrace();
+		}
 		groups.put("groats", hs);
 		
 		CopyOnWriteArraySet<Goods> hs1 = new CopyOnWriteArraySet<Goods>();
-		hs1.add(new Goods("milk", 23, 500));
-		hs1.add(new Goods("cheese", 44, 900));
-		hs1.add(new Goods("butter", 42, 800));
+		try {
+			hs1.add(new Goods("milk", 23, 500));
+			hs1.add(new Goods("cheese", 44, 900));
+			hs1.add(new Goods("butter", 42, 800));
+		} catch (InvalidCharacteristicOfGoodsException e) {
+			e.printStackTrace();
+		}
+		
 		groups.put("dairy", hs1);
 		
 	}
@@ -42,17 +53,17 @@ public class Warehouse {
 		}
 	}
 	
-	public void setPrice(String nameOfGroup, String nameOfGoods, double price) {
+	public void setPrice(String nameOfGroup, String nameOfGoods, double price) throws InvalidCharacteristicOfGoodsException {
 		findGoods(nameOfGroup, nameOfGoods).setPrice(price);
 	}
 	
-	public void addGoods(String nameOfGroup, String nameOfGoods, int quantity) {
+	public void addGoods(String nameOfGroup, String nameOfGoods, int quantity) throws InvalidCharacteristicOfGoodsException {
 		Goods g = findGoods(nameOfGroup, nameOfGoods);
 		int newQ = g.getQuantity()+quantity;
 		g.setQuantity(newQ);
 	}
 	
-	public void removeGoods(String nameOfGroup, String nameOfGoods, int quantity) {
+	public void removeGoods(String nameOfGroup, String nameOfGoods, int quantity) throws InvalidCharacteristicOfGoodsException {
 		Goods g = findGoods(nameOfGroup, nameOfGoods);
 		int newQ = g.getQuantity()-quantity;
 		g.setQuantity(newQ);

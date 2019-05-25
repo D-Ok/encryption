@@ -18,6 +18,11 @@ import messaging.exceptions.ArgumentException;
 import messaging.exceptions.NoMessageException;
 
 public class AppTest {
+	
+	@Test
+	public void testGeneratingMessages() {
+		App.generateMessages(100000);
+	}
 
     @Test
     public void testCreator() {

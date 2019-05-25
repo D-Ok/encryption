@@ -1,6 +1,8 @@
 package messaging;
 
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -11,37 +13,18 @@ import messaging.exceptions.InjuredPackageException;
 import messaging.exceptions.NoMessageException;
 
 public class App {
-
+	
+	private volatile static Receiver r = new Receiver();
 		   	  public static void main(String[] args) {
-//		   			JsonArray ja = new JsonArray();
-//		   			ja.add("some string");
-//		   			ja.add("one more string");
-//		   			
-//		   			JsonObject jo = new JsonObject();
-//		   			jo.addProperty("userName", "Mary");
-//		   			jo.addProperty("location", "Chernihiv");
-//		   			jo.add("messages", ja);
-//		   			
-//		   			byte src = 1;
-//		   			byte[] bytes = createPackage(src, 4, 145, jo);
-//		   			getPackageAndPrintInformation(bytes);
-//		   			
-//		   			src = 8;
-//		   			
-//		   			jo = new JsonObject();
-//		   			jo.addProperty("userName", "Mark");
-//		   			jo.addProperty("location", "Kyiv");
-//		   			jo.addProperty("message", "useful information");
-//		   			
-//		   			bytes = createPackage(src, 2, 333, jo);
-//		   			getPackageAndPrintInformation(bytes);
-//
-//		   			bytes = createPackage((byte)3313, 4, 145, jo);
-//		   			getPackageAndPrintInformation(bytes);
-		   	
-		   		  Receiver r = new Receiver();
-		   		  r.receiveMessage();
-		   		
+		   		  generateMessages(100000);
+		   	  }
+		   	  
+		   	  public static void generateMessages(int numberOfMessages) {
+		   		  ExecutorService ex= Executors.newFixedThreadPool(3);
+		   		  
+		   		  for(int i=0; i<numberOfMessages; i++) {
+		   			  ex.execute(new GeneratorOfMessages());
+		   		  }
 		   	  }
 		   	  
 		   	  public static PackageGetter getPackageAndPrintInformation(byte[] bytes) { 
@@ -74,4 +57,13 @@ public class App {
 				}
 		   		return null;
 		   	  }
+			
+			private static class GeneratorOfMessages implements Runnable{
+
+				@Override
+				public void run() {
+					r.receiveMessage();
+				}
+				
+			}
 }

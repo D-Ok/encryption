@@ -10,7 +10,7 @@ public class Sender {
 		PackageGetter pg;
 		try {
 			pg = new PackageGetter(mess);
-			System.out.println("Sending message:\n"+pg.toString());
+			System.out.println("\nSending message:\n"+pg.toString());
 		} catch (InjuredPackageException e) {
 			e.printStackTrace();
 		}

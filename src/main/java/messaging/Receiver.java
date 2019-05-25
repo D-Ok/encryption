@@ -5,7 +5,7 @@ import java.util.Random;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class Receiver {
+public class Receiver implements ReceiverI{
 	
 	final Random random = new Random();
 	Decriptor decriptor = new Decriptor();
@@ -17,8 +17,7 @@ public class Receiver {
 	public void receiveMessage() {
 		
 		Package pk;
-		for(int i=0; i<100; i++) {
-			
+		
 			JsonObject jo = new JsonObject();
 			int cType= random.nextInt(6);
 			switch (cType) {
@@ -67,6 +66,5 @@ public class Receiver {
 				e.printStackTrace();
 			}
 			
-		}
 	}
 }
