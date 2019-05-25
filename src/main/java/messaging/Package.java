@@ -46,7 +46,6 @@ public class Package {
 	
 	private byte[] wholePackage;
 	
-	
 	public Package( byte src, int commandType, int userId, JsonElement jsonMessage) 
 			throws NoMessageException, ArgumentException, Exception {
 		if(jsonMessage == null) throw new NullPointerException();
@@ -142,7 +141,7 @@ public class Package {
 		return wholePackage;
 	}
 
-	public static byte[] encryptMessage( String message) {
+	public static synchronized byte[] encryptMessage( String message) {
 		try {
 			  if(cipher == null) initializeCipher();
 			  if(key == null) initializeKey();
@@ -158,7 +157,7 @@ public class Package {
 		  return null;
 	  }
 	
-	public static String decryptMessage(byte[] mess) {
+	public static synchronized String decryptMessage(byte[] mess) {
 		  try {
 			if(cipher == null) initializeCipher();
 			if(key == null) initializeKey();

@@ -13,31 +13,34 @@ import messaging.exceptions.NoMessageException;
 public class App {
 
 		   	  public static void main(String[] args) {
-		   			JsonArray ja = new JsonArray();
-		   			ja.add("some string");
-		   			ja.add("one more string");
-		   			
-		   			JsonObject jo = new JsonObject();
-		   			jo.addProperty("userName", "Mary");
-		   			jo.addProperty("location", "Chernihiv");
-		   			jo.add("messages", ja);
-		   			
-		   			byte src = 1;
-		   			byte[] bytes = createPackage(src, 4, 145, jo);
-		   			getPackageAndPrintInformation(bytes);
-		   			
-		   			src = 8;
-		   			
-		   			jo = new JsonObject();
-		   			jo.addProperty("userName", "Mark");
-		   			jo.addProperty("location", "Kyiv");
-		   			jo.addProperty("message", "useful information");
-		   			
-		   			bytes = createPackage(src, 2, 333, jo);
-		   			getPackageAndPrintInformation(bytes);
-
-		   			bytes = createPackage((byte)3313, 4, 145, jo);
-		   			getPackageAndPrintInformation(bytes);
+//		   			JsonArray ja = new JsonArray();
+//		   			ja.add("some string");
+//		   			ja.add("one more string");
+//		   			
+//		   			JsonObject jo = new JsonObject();
+//		   			jo.addProperty("userName", "Mary");
+//		   			jo.addProperty("location", "Chernihiv");
+//		   			jo.add("messages", ja);
+//		   			
+//		   			byte src = 1;
+//		   			byte[] bytes = createPackage(src, 4, 145, jo);
+//		   			getPackageAndPrintInformation(bytes);
+//		   			
+//		   			src = 8;
+//		   			
+//		   			jo = new JsonObject();
+//		   			jo.addProperty("userName", "Mark");
+//		   			jo.addProperty("location", "Kyiv");
+//		   			jo.addProperty("message", "useful information");
+//		   			
+//		   			bytes = createPackage(src, 2, 333, jo);
+//		   			getPackageAndPrintInformation(bytes);
+//
+//		   			bytes = createPackage((byte)3313, 4, 145, jo);
+//		   			getPackageAndPrintInformation(bytes);
+		   	
+		   		  Receiver r = new Receiver();
+		   		  r.receiveMessage();
 		   		
 		   	  }
 		   	  

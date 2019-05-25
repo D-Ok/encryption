@@ -21,19 +21,23 @@ public class Message {
 	}
 
 	public String getNameOfGoods() {
-		return jo.get("nameOfGoods").getAsString();
+		if(jo.has("nameOfGoods")) return jo.get("nameOfGoods").getAsString();
+		else return "";
 	}
 
 	public String getNameOfGroup() {
-		return jo.get("nameOfGroup").getAsString();
+		if(jo.has("nameOfGroup")) return jo.get("nameOfGroup").getAsString();
+		else return "";
 	}
 
 	public int getQuantity() {
-		return jo.get("quantity").getAsInt();
+		if(jo.has("quantity")) return jo.get("quantity").getAsInt();
+		else return 0;
 	}
 
 	public double getPrice() {
-		return jo.get("price").getAsDouble();
+		if(jo.has("price")) return jo.get("price").getAsDouble();
+		else return 0;
 	}
 	
 	public Message(int cType, int userId, JsonElement message){
@@ -42,7 +46,7 @@ public class Message {
 		this.userId = userId;
 		
 		this.jo = (JsonObject) message;
-		informationMessage = message.getAsString();
+		informationMessage = message.toString();
 		
 	}
 	
