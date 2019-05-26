@@ -8,12 +8,11 @@ import messaging.warehouse.Warehouse;
 
 public class Processor {
 	
-	private final Warehouse warehouse;
+	public static final Warehouse warehouse = new Warehouse();
 	private final Encriptor encriptor;
 	private ExecutorService ex;
 	
 	public Processor() {
-		warehouse = new Warehouse();
 		encriptor = new Encriptor();
 		ex = Executors.newFixedThreadPool(3);
 	}

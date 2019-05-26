@@ -16,6 +16,7 @@ import com.google.gson.JsonObject;
 
 import messaging.exceptions.ArgumentException;
 import messaging.exceptions.NoMessageException;
+import messaging.warehouse.Warehouse;
 
 public class AppTest {
 	

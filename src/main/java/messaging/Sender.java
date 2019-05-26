@@ -11,6 +11,7 @@ public class Sender {
 		try {
 			pg = new PackageGetter(mess);
 			System.out.println("\nSending message:\n"+pg.toString());
+			System.out.println("After command: \n"+Processor.warehouse.toString());
 		} catch (InjuredPackageException e) {
 			e.printStackTrace();
 		}

@@ -1,9 +1,7 @@
 package messaging.warehouse;
-
-import java.util.HashSet;
+ 
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import messaging.exceptions.InvalidCharacteristicOfGoodsException;
@@ -11,7 +9,7 @@ import messaging.exceptions.InvalidCharacteristicOfGoodsException;
 
 public class Warehouse {
 	
-	static enum CommandTypes{ QuantityOfGoods, CellGoods, AddGoods, 
+	public static enum CommandTypes{ QuantityOfGoods, CellGoods, AddGoods, 
 		AddGroup, AddNameOfGoodsToGroup, SetPrice};
 	
 
@@ -83,5 +81,21 @@ public class Warehouse {
 				}
 		}
 		 return null;
+	}
+	
+	public String toString() {
+		Iterator<String> it = groups.keys().asIterator();
+		String cur;
+		String result = "";
+		while(it.hasNext()) {
+			cur = it.next();
+			result+="\n"+cur+": ";
+			for(Goods g:groups.get(cur)) {
+				result+=g+", ";
+			}
+			
+		}
+		
+		return result;
 	}
 }

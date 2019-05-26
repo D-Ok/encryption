@@ -1,5 +1,7 @@
 package messaging.warehouse;
 
+import java.util.Iterator;
+
 import messaging.exceptions.InvalidCharacteristicOfGoodsException;
 
 public class Goods {
@@ -46,5 +48,8 @@ public class Goods {
 		this.quantity = quantity;
 		this.price = price;
 	}
-
+	
+	public String toString() {
+		return "Name: "+name+" Quantity: "+quantity+" Price: "+price;
+	}
 }
