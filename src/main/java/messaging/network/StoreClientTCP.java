@@ -43,38 +43,25 @@ public class StoreClientTCP implements Runnable{
             OutputStream out = s.getOutputStream();
 
             while (true) {
-            	
+            	if(s.isConnected()) {
             	buffer = Client.generatePackage().getWholePackage();
             	PackageGetter pg;
                 out.write(buffer, 0, buffer.length);
                 
                 try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-				}
-               // List<Integer> ans = new LinkedList<Integer>;
-                try {
-                	System.out.println("1");
-                	 byte[] answer = new byte[0];
-                	    byte[] buff = new byte[1024];
-                	    int k = -1;
-                	    while((k = in.read(buff, 0, buff.length)) > -1) {
-                	        byte[] tbuff = new byte[answer.length + k]; // temp buffer size = bytes already read + bytes last read
-                	        System.arraycopy(answer, 0, tbuff, 0, answer.length); // copy previous bytes
-                	        System.arraycopy(buff, 0, tbuff, answer.length, k);  // copy current lot
-                	        answer = tbuff; // call the temp buffer as your result buff
-                	    }
-                 System.out.println("2");
+                	int numToWrite = 200;
+                	 byte[] answer = new byte[numToWrite];
+                	 int sofar = 0;
+                     while (sofar < numToWrite) {
+                         sofar += in.read(answer, sofar, numToWrite - sofar);
+                     }
 					pg = new PackageGetter(answer);
 					System.out.println(Thread.currentThread() + " wrote " + pg);
 				} catch (InjuredPackageException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}catch(IOException ie) {
-                	System.out.println("hereEx");
+					ie.printStackTrace();
                 }
-                
 
                 int pause = minPause +
                         (int) (rand.nextDouble() * (maxPause - minPause));
@@ -82,6 +69,10 @@ public class StoreClientTCP implements Runnable{
                     Thread.sleep(pause);
                 } catch (InterruptedException ie) {
                 }
+                
+            } else {
+            	s = new Socket(host, port);
+            }
             }
         } catch (IOException ie) {
             ie.printStackTrace();

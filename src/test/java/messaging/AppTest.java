@@ -141,19 +141,19 @@ public class AppTest {
     	jo.addProperty("message", "value");
     	byte [] bytes = App.createPackage((byte)1, 5, 678, jo);
     	
-    	PackageChecker pCh = new PackageChecker(bytes);
+    	PackageChecker pCh = new PackageChecker(bytes, 10);
     	Assert.assertTrue(pCh.isCorrect());
     	Assert.assertTrue(pCh.isCorrectDescription());
     	Assert.assertTrue(pCh.isCorrectContent());
     	
     	bytes[0]--;
-    	pCh = new PackageChecker(bytes);
+    	pCh = new PackageChecker(bytes, 10);
     	Assert.assertFalse(pCh.isCorrect());
     	Assert.assertFalse(pCh.isCorrectDescription());
     	Assert.assertTrue(pCh.isCorrectContent());
     	
     	bytes[bytes.length-3]++;
-    	pCh = new PackageChecker(bytes);
+    	pCh = new PackageChecker(bytes, 10);
     	Assert.assertFalse(pCh.isCorrect());
     	Assert.assertFalse(pCh.isCorrectDescription());
     	Assert.assertFalse(pCh.isCorrectContent());

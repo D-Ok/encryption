@@ -25,9 +25,8 @@ public class PackageGetter {
 		if(wholeMessage == null) throw new NullPointerException();
 		
 		byte[] len= new byte[4];
-		for(int i=10, l=0; i<14; i++, l++) {
+		for(int i=10, l=0; i<14; i++, l++)  
 			len[l]=wholeMessage[i];
-		}
 		wLen=ByteBuffer.wrap(len).getInt();
 		
 		PackageChecker check =new PackageChecker(wholeMessage, wLen+18);

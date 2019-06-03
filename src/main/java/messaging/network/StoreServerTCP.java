@@ -9,8 +9,6 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
@@ -21,8 +19,6 @@ import messaging.Decriptor;
 public class StoreServerTCP  extends Server implements Runnable{
   // The port we will listen on
   private int port;
-  private static int freeUnicNumber = 1;
-  private Set<Integer> processingMessages;
   private Decriptor decriptor;
   private static ConcurrentHashMap<Integer, byte[]> answers;
   
@@ -31,7 +27,7 @@ public class StoreServerTCP  extends Server implements Runnable{
   }
 
   // A pre-allocated buffer for encrypting data
-  private static final ByteBuffer buffer = ByteBuffer.allocate( 163840 );
+  private static ByteBuffer buffer = ByteBuffer.allocate( 163840 );
 
   public StoreServerTCP( int port ) {
     this.port = port;
@@ -126,7 +122,6 @@ public class StoreServerTCP  extends Server implements Runnable{
     sc.read( buffer );
     buffer.flip();
 
-    // If no data, close the connection
     if (buffer.limit()==0) {
       return false;
     }
@@ -143,30 +138,27 @@ public class StoreServerTCP  extends Server implements Runnable{
     decriptor.decript(message, unicNumb);
     
     buffer.clear();
-   // buffer.flip();
     while(true)
     if(answers.containsKey(unicNumb)) {
-    	buffer.put(answers.get(unicNumb));
+    	byte[] answer = answers.get(unicNumb);
+    	byte[] toWrite = new byte[200];
+    	for(int i=0; i<200; i++) {
+    		if(i<answer.length) toWrite[i]=answer[i];
+    		else toWrite[i]=0;
+    	}
+    	buffer.put(toWrite);
     	break;
     }
     
+    buffer.flip();
     sc.write( buffer );
+    
     answers.remove(unicNumb);
-//    buffer.clear();
-//    sc.read( buffer );
-//    buffer.flip();
-//    
-//    if (buffer.limit()==0) System.out.println("User doesn`t accept message");
-//    //sc.register(selector, SelectionKey.OP_WRITE, unicNumb);
-//    
     System.out.println( "Processed "+buffer.limit()+" from "+sc );
     
     return true;
   }
-  
-  public static byte[] getAnswer(byte[] message) {
-	 return message;
-  }
+
 
   static public void main( String args[] ) throws Exception {
     int port = 1050;
