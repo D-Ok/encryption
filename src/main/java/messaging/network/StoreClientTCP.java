@@ -5,7 +5,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
+
+import messaging.PackageGetter;
+import messaging.exceptions.InjuredPackageException;
 
 public class StoreClientTCP implements Runnable{
 	private String host;
@@ -40,14 +45,36 @@ public class StoreClientTCP implements Runnable{
             while (true) {
             	
             	buffer = Client.generatePackage().getWholePackage();
-            			
+            	PackageGetter pg;
                 out.write(buffer, 0, buffer.length);
-                int sofar = 0;
-                while (sofar < buffer.length) {
-                    sofar += in.read(buffer, sofar, buffer.length - sofar);
+                
+                try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+               // List<Integer> ans = new LinkedList<Integer>;
+                try {
+                	System.out.println("1");
+                	 byte[] answer = new byte[0];
+                	    byte[] buff = new byte[1024];
+                	    int k = -1;
+                	    while((k = in.read(buff, 0, buff.length)) > -1) {
+                	        byte[] tbuff = new byte[answer.length + k]; // temp buffer size = bytes already read + bytes last read
+                	        System.arraycopy(answer, 0, tbuff, 0, answer.length); // copy previous bytes
+                	        System.arraycopy(buff, 0, tbuff, answer.length, k);  // copy current lot
+                	        answer = tbuff; // call the temp buffer as your result buff
+                	    }
+                 System.out.println("2");
+					pg = new PackageGetter(answer);
+					System.out.println(Thread.currentThread() + " wrote " + pg);
+				} catch (InjuredPackageException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}catch(IOException ie) {
+                	System.out.println("hereEx");
                 }
-
-                System.out.println(Thread.currentThread() + " wrote " + buffer.length);
+                
 
                 int pause = minPause +
                         (int) (rand.nextDouble() * (maxPause - minPause));

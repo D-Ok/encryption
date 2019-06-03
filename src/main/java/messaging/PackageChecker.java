@@ -7,18 +7,18 @@ public class PackageChecker {
   private boolean correctContent;
  // public String err;
   
-	public PackageChecker(byte[] message) {
+	public PackageChecker(byte[] message, int length) {
 		if(message == null) throw new NullPointerException();
 		
 		byte[] firstCheck = new byte[14];
-		byte[] secondCheck = new byte[message.length-4-14];
+		byte[] secondCheck = new byte[length-4-14];
 		byte[] firstCrc=new byte[2];
 		byte[] secondCrc=new byte[2];
 		
 		
 		
 		
-		for(int i=0, j=0, k=0; i<message.length; i++)
+		for(int i=0, j=0, k=0; i<length; i++)
 		{
 			if(i<14) {
 				firstCheck[j]=message[i];
@@ -26,11 +26,11 @@ public class PackageChecker {
 			}else if(i<16){
 				if(i==14) firstCrc[0]=message[i];
 				else firstCrc[1]=message[i];
-			}else if(i<message.length-2){
+			}else if(i<length-2){
 				secondCheck[k]=message[i];
 				k++;
 			}else {
-				if(i==message.length-2) secondCrc[0]=message[i];
+				if(i==length-2) secondCrc[0]=message[i];
 				else secondCrc[1]=message[i];
 			}
 		}

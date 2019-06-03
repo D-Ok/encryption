@@ -23,34 +23,30 @@ public class PackageGetter {
 	
 	public PackageGetter(byte[] wholeMessage) throws InjuredPackageException{
 		if(wholeMessage == null) throw new NullPointerException();
-		PackageChecker check =new PackageChecker(wholeMessage);
-		if(!check.isCorrect()) {
-			//System.out.println(check.err);
-			throw new InjuredPackageException();
+		
+		byte[] len= new byte[4];
+		for(int i=10, l=0; i<14; i++, l++) {
+			len[l]=wholeMessage[i];
 		}
+		wLen=ByteBuffer.wrap(len).getInt();
+		
+		PackageChecker check =new PackageChecker(wholeMessage, wLen+18);
+		if(!check.isCorrect()) throw new InjuredPackageException();
 		
 		bMagic=wholeMessage[0];
 		bSrc=wholeMessage[1];
 		
 		byte[] pktId = new byte[8];
-		byte[] len= new byte[4];
 		byte[] type= new byte[4];
 		byte[] userId= new byte[4];
-		byte[] mess = null;
+		byte[] mess = new byte[wLen-8];
 		
-		for(int i=2, p=0, l=0, t=0, u=0, m=0; i<wholeMessage.length; i++){
+		for(int i=2, p=0, t=0, u=0, m=0; i<wLen+18; i++){
 			if(i<10) {
 				pktId[p]=wholeMessage[i];
 				p++;
 				if(p==8) bPktId=ByteBuffer.wrap(pktId).getLong();
-			} else if(i<14) {
-				len[l]=wholeMessage[i];
-				l++;
-				if(l==4) {
-					wLen=ByteBuffer.wrap(len).getInt();
-					mess = new byte[wLen-8];
-				}
-			} else if(i>15 && i<20) {
+			}  else if(i>15 && i<20) {
 				type[t]=wholeMessage[i];
 				t++;
 				if(t==4) cType=ByteBuffer.wrap(type).getInt();
@@ -58,7 +54,7 @@ public class PackageGetter {
 				userId[u]=wholeMessage[i];
 				u++;
 				if(u==4) bUserId=ByteBuffer.wrap(userId).getInt();
-			}  else if(i>23 && i<wholeMessage.length-2) {
+			}  else if(i>23 && i<16+wLen) {
 				mess[m]=wholeMessage[i];
 				m++;
 			}

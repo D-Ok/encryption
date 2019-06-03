@@ -143,6 +143,7 @@ public class StoreServerTCP  extends Server implements Runnable{
     decriptor.decript(message, unicNumb);
     
     buffer.clear();
+   // buffer.flip();
     while(true)
     if(answers.containsKey(unicNumb)) {
     	buffer.put(answers.get(unicNumb));
