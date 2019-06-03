@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 public class PackageChecker {
   private boolean correctDescription;
   private boolean correctContent;
+ // public String err;
   
 	public PackageChecker(byte[] message) {
 		if(message == null) throw new NullPointerException();
@@ -13,6 +14,9 @@ public class PackageChecker {
 		byte[] secondCheck = new byte[message.length-4-14];
 		byte[] firstCrc=new byte[2];
 		byte[] secondCrc=new byte[2];
+		
+		
+		
 		
 		for(int i=0, j=0, k=0; i<message.length; i++)
 		{
@@ -30,6 +34,13 @@ public class PackageChecker {
 				else secondCrc[1]=message[i];
 			}
 		}
+		
+//		String e = "Get bytes: ";
+//        for(int i=0; i<secondCheck.length; i++) {
+//        	e+=secondCheck[i]+"\n ";
+//        }
+//       // System.out.println(e);
+//        err= e;
 		
 		correctDescription = CRC16.calculate(firstCheck)==ByteBuffer.wrap(firstCrc).getChar();
 		correctContent = CRC16.calculate(secondCheck)==ByteBuffer.wrap(secondCrc).getChar();		

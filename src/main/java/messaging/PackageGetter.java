@@ -24,7 +24,10 @@ public class PackageGetter {
 	public PackageGetter(byte[] wholeMessage) throws InjuredPackageException{
 		if(wholeMessage == null) throw new NullPointerException();
 		PackageChecker check =new PackageChecker(wholeMessage);
-		if(!check.isCorrect()) throw new InjuredPackageException();
+		if(!check.isCorrect()) {
+			//System.out.println(check.err);
+			throw new InjuredPackageException();
+		}
 		
 		bMagic=wholeMessage[0];
 		bSrc=wholeMessage[1];

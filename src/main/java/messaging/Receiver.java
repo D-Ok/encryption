@@ -46,7 +46,7 @@ public class Receiver implements ReceiverI{
 				break;
 			case 4:
 				jo.addProperty("nameOfGroup", groups[random.nextInt(2)]);
-				jo.addProperty("nameOfGoods", ""+random.nextInt(1000));
+				jo.addProperty("nameOfGoods", "good"+random.nextInt(1000));
 				break;
 			case 5:
 				j = random.nextInt(2);
@@ -61,7 +61,7 @@ public class Receiver implements ReceiverI{
 			
 			try {
 				pk = new Package((byte) random.nextInt(127), cType, random.nextInt(1000), (JsonElement) jo);
-				decriptor.decript(pk.getWholePackage());
+				//decriptor.decript(pk.getWholePackage());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

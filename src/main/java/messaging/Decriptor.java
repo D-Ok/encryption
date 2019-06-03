@@ -4,6 +4,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import messaging.exceptions.InjuredPackageException;
+import messaging.network.Server;
 
 public class Decriptor {
 	
@@ -15,21 +16,23 @@ public class Decriptor {
 		ex = Executors.newFixedThreadPool(3);
 	}
 	
-	public void decript(byte[] message) {
-		ex.execute(new DecriptMessage(message));
+	public void decript(byte[] message, int number) {
+		ex.execute(new DecriptMessage(message, number));
 	}
 	
 	private class DecriptMessage implements  Runnable{
 
 		private final byte[] message;
-		public DecriptMessage(byte[] message) {
+		private final int num;
+		public DecriptMessage(byte[] message, int num) {
 			this.message = message;
+			this.num = num;
 		}
 		@Override
 		public void run() {
 			try {
 				PackageGetter pg= new PackageGetter(message);
-				processor.process(new Message(pg.getcType(), pg.getbUserId(), pg.getMessageJson()));
+				processor.process(new Message(pg.getcType(), pg.getbUserId(), pg.getMessageJson()), num);
 			} catch (InjuredPackageException e) {
 				e.printStackTrace();
 			}

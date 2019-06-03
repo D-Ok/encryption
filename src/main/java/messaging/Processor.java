@@ -17,15 +17,17 @@ public class Processor {
 		ex = Executors.newFixedThreadPool(3);
 	}
 	
-	public void process(Message message) {
-		ex.execute(new ProcessMessage(message));
+	public void process(Message message, int num) {
+		ex.execute(new ProcessMessage(message, num));
 	}
 	
 	private class ProcessMessage implements Runnable{
 		
 		Message message;
-		ProcessMessage(Message message){
+		private final int num;
+		ProcessMessage(Message message, int num){
 			this.message = message;
+			this.num = num;
 		}
 		@Override
 		public void run() {
@@ -65,7 +67,7 @@ public class Processor {
 				break;
 			case 4:
 				warehouse.addNameOfGoodtToGroup(group, goods);
-				info = "Was added goods with name '"+goods+"' to the group "+group;
+				info = "Was added goods with name "+goods.toString()+" to the group "+group;
 				break;
 			case 5:
 				try {
@@ -79,7 +81,7 @@ public class Processor {
 				break;
 		}
 
-			encriptor.encryption(new Message(cType, userId, info));
+			encriptor.encryption(new Message(cType, userId, info), num);
 	}
 	}
 }

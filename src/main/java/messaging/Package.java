@@ -2,6 +2,7 @@ package messaging;
 
 import java.io.UnsupportedEncodingException; 
 import java.nio.ByteBuffer;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
@@ -12,6 +13,8 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -141,33 +144,88 @@ public class Package {
 		return wholePackage;
 	}
 
-	public static synchronized byte[] encryptMessage( String message) {
-		try {
-			  if(cipher == null) initializeCipher();
-			  if(key == null) initializeKey();
-			  cipher.init(Cipher.ENCRYPT_MODE, key);
+	public static final String AES_KEY = "0366D8637F9C6B21";      
+	public static byte[] IV_VECTOR = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-			  byte[] plainText  = message.getBytes("UTF-8");
-			  byte[] cipherText = cipher.doFinal(plainText);
-			  return cipherText;
-		      
-		} catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException e) {
+	public static synchronized byte[] encryptMessage( String message) {
+//		try {
+//			  if(cipher == null) initializeCipher();
+//			  if(key == null) initializeKey();
+//			  cipher.init(Cipher.ENCRYPT_MODE, key);
+//
+//			  byte[] plainText  = message.getBytes("UTF-8");
+//			  byte[] cipherText = cipher.doFinal(plainText);
+//			  return cipherText;
+//		      
+//		} catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException e) {
+//			e.printStackTrace();
+//		}
+//		  return null;
+		
+		Cipher cipher;
+		try {
+			cipher = Cipher.getInstance("AES");
+			byte[] static_key = AES_KEY.getBytes();
+
+	        Key keySpec = new SecretKeySpec(static_key, "AES");
+	        //IvParameterSpec ivSpec = new IvParameterSpec(IV_VECTOR);
+	        cipher.init(Cipher.ENCRYPT_MODE, keySpec);
+
+	        byte[] results = cipher.doFinal(message.getBytes("UTF-8"));
+	        return results;
+
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidKeyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+//		} catch (InvalidAlgorithmParameterException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+		} catch (IllegalBlockSizeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (BadPaddingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		  return null;
+		
+		return null;
+        
 	  }
 	
 	public static synchronized String decryptMessage(byte[] mess) {
-		  try {
-			if(cipher == null) initializeCipher();
-			if(key == null) initializeKey();
-			cipher.init(Cipher.DECRYPT_MODE, key);
-			byte[] cipherText = cipher.doFinal(mess);
-			return new String(cipherText, "UTF-8");
-		} catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException e) {
+//		  try {
+//			if(cipher == null) initializeCipher();
+//			if(key == null) initializeKey();
+//			cipher.init(Cipher.DECRYPT_MODE, key);
+//			byte[] cipherText = cipher.doFinal(mess);
+//			return new String(cipherText, "UTF-8");
+//		} catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException e) {
+//			e.printStackTrace();
+//		}
+//		  return null;
+
+        Cipher cipher;
+		try {
+			cipher = Cipher.getInstance("AES");
+			 byte[] static_key = AES_KEY.getBytes();
+
+		        Key keySpec = new SecretKeySpec(static_key, "AES");
+		      //  IvParameterSpec ivSpec = new IvParameterSpec(IV_VECTOR);
+		        cipher.init(Cipher.DECRYPT_MODE, keySpec);
+
+		        byte[] decrypted = cipher.doFinal(mess);
+		        String result = new String(decrypted);
+		        return result;
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
 			e.printStackTrace();
 		}
-		  return null;
+       return null;
 	      
 	}
 	
@@ -187,10 +245,20 @@ public class Package {
 		      KeyGenerator keyGen = KeyGenerator.getInstance(algoritm);
 		      SecureRandom secRandom = new SecureRandom();
 		      keyGen.init(secRandom);
+		      //key = Key
 		      key = keyGen.generateKey();   
 			} catch (NoSuchAlgorithmException e) {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public static Key getKey() {
+		if(key==null) initializeKey();
+		return key;
+	}
+	
+	public static void setKey(Key k) {
+		key = k;
 	}
 }

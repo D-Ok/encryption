@@ -2,6 +2,7 @@ package messaging;
 
 import messaging.exceptions.ArgumentException;
 import messaging.exceptions.NoMessageException;
+import messaging.network.StoreServerTCP;
 
 import java.net.InetAddress;
 import java.util.concurrent.ExecutorService;
@@ -18,8 +19,8 @@ public class Encriptor {
 		ex = Executors.newFixedThreadPool(3);
 	}
 	
-	public void encryption(Message message) {
-		ex.execute(new EncryptMessage(message));
+	public void encryption(Message message, int num) {
+		ex.execute(new EncryptMessage(message, num));
 	}
 	
 	private byte[] encrypt(Message message) throws NoMessageException, ArgumentException, Exception {
@@ -30,13 +31,16 @@ public class Encriptor {
 	private class EncryptMessage implements  Runnable{
 
 		private final Message message;
-		public EncryptMessage(Message message) {
+		private final int num;
+		public EncryptMessage(Message message, int num) {
 			this.message = message;
+			this.num = num;
 		}
 		@Override
 		public void run() {
 			try {
-				sender.sendMessage(encrypt(message), InetAddress.getLocalHost());
+				//sender.sendMessage(encrypt(message), InetAddress.getLocalHost());
+				StoreServerTCP.setAnswer(num, encrypt(message));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

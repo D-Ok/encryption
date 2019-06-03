@@ -21,8 +21,68 @@ import messaging.warehouse.Warehouse;
 public class AppTest {
 	
 	@Test
-	public void testGeneratingMessages() {
-		App.generateMessages(100000);
+	public void testRightQuantity() {
+		Decriptor dec = new Decriptor();
+ 		  
+ 		  String[] groups = {"groats", "dairy"};
+ 		  String[] groupG = {"buckwheat", "fig","bulgur"};
+ 		  String[] groupD = {"milk", "cheese", "butter"};
+ 		  
+ 		  System.out.println("Before commands: \n"+Processor.warehouse.toString());
+ 		
+ 		  JsonObject jo = new JsonObject();
+ 		  jo.addProperty("nameOfGroup", groups[1]);
+ 		  jo.addProperty("nameOfGoods", groupD[1]);
+ 		  jo.addProperty("quantity", 200);
+ 		  App.sendMess(jo, dec, Warehouse.CommandTypes.AddGoods.ordinal());
+ 		  
+ 		  jo = new JsonObject();
+ 		  jo.addProperty("nameOfGroup", groups[1]);
+ 		  jo.addProperty("nameOfGoods", groupD[1]);
+ 		  jo.addProperty("quantity", 100);
+ 		 App.sendMess(jo, dec, Warehouse.CommandTypes.AddGoods.ordinal());
+ 		  
+ 	   	  jo = new JsonObject();
+ 		  jo.addProperty("nameOfGroup", groups[1]);
+ 		  jo.addProperty("nameOfGoods", groupD[1]);
+ 		  jo.addProperty("quantity", 200);
+ 		 App.sendMess(jo, dec, Warehouse.CommandTypes.AddGoods.ordinal());
+ 		  
+ 		  jo = new JsonObject();
+ 		  jo.addProperty("nameOfGroup", groups[1]);
+ 		  jo.addProperty("nameOfGoods", groupD[1]);
+ 		  jo.addProperty("quantity", 1000);
+ 		 App.sendMess(jo, dec, Warehouse.CommandTypes.CellGoods.ordinal());
+ 		  
+ 		  jo = new JsonObject();
+ 		  jo.addProperty("nameOfGroup", groups[1]);
+ 		  jo.addProperty("nameOfGoods", groupD[1]);
+ 		  jo.addProperty("quantity", 400);
+ 		 App.sendMess(jo, dec, Warehouse.CommandTypes.CellGoods.ordinal());
+ 		  
+ 		  jo = new JsonObject();
+ 		  jo.addProperty("nameOfGroup", groups[1]);
+ 		  jo.addProperty("nameOfGoods", groupD[1]);
+ 		  jo.addProperty("quantity", 300);
+ 		 App.sendMess(jo, dec, Warehouse.CommandTypes.AddGoods.ordinal());
+ 		  
+ 		  jo = new JsonObject();
+ 		  jo.addProperty("nameOfGroup", groups[1]);
+ 		  jo.addProperty("nameOfGoods", groupD[1]);
+ 		  jo.addProperty("quantity", 1000);
+ 		 App.sendMess(jo, dec, Warehouse.CommandTypes.CellGoods.ordinal());
+		try {
+			Thread.sleep(1500);
+			int quantity = Processor.warehouse.getQuantityOfGoods(groups[1], groupD[1]);
+			Assert.assertEquals(300, quantity);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void testGenerator() {
+		//App.generateMessages(100000);
 	}
 
     @Test
