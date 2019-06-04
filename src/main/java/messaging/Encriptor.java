@@ -2,6 +2,7 @@ package messaging;
 
 import messaging.exceptions.ArgumentException;
 import messaging.exceptions.NoMessageException;
+import messaging.network.Server;
 import messaging.network.StoreServerTCP;
 
 import java.net.InetAddress;
@@ -40,7 +41,7 @@ public class Encriptor {
 		public void run() {
 			try {
 				//sender.sendMessage(encrypt(message), InetAddress.getLocalHost());
-				StoreServerTCP.setAnswer(num, encrypt(message));
+				Server.setAnswer(num, encrypt(message));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

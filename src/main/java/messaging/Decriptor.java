@@ -36,7 +36,7 @@ public class Decriptor {
 				processor.process(new Message(pg.getcType(), pg.getbUserId(), pg.getMessageJson()), num);
 			} catch (InjuredPackageException e) {
 				byte[] ans = {0};
-				StoreServerTCP.setAnswer(num, ans);
+				Server.setAnswer(num, ans);
 			}
 		}
 		

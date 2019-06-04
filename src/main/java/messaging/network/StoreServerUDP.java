@@ -1,13 +1,13 @@
 package messaging.network;
 
 import java.io.IOException;
+import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Random;
@@ -16,16 +16,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import messaging.Decriptor;
 
-public class StoreServerTCP implements Runnable, Server {
+public class StoreServerUDP implements Runnable, Server {
 	// The port we will listen on
 	private int port;
 	private Decriptor decriptor;
-	
 
 	// A pre-allocated buffer for encrypting data
 	private static ByteBuffer buffer = ByteBuffer.allocate(1024);
-
-	public StoreServerTCP(int port) {
+	
+	public StoreServerUDP(int port) {
 		this.port = port;
 		decriptor = new Decriptor();
 		new Thread(this).start();
@@ -36,16 +35,16 @@ public class StoreServerTCP implements Runnable, Server {
 
 	public void run() {
 		try {
-			ServerSocketChannel serverChannel = ServerSocketChannel.open();
-			serverChannel.configureBlocking(false);
+			DatagramChannel channel = DatagramChannel.open();
+			channel.configureBlocking(false);
 
-			ServerSocket serverSocket = serverChannel.socket();
+			DatagramSocket serverSocket = channel.socket();
 			InetSocketAddress isa = new InetSocketAddress(port);
 			serverSocket.bind(isa);
 
 			selector = Selector.open();
 
-			serverChannel.register(selector, SelectionKey.OP_ACCEPT);
+			channel.register(selector, SelectionKey.OP_READ);
 			System.out.println("Listening on port " + port);
 
 			while (true) {
@@ -60,23 +59,15 @@ public class StoreServerTCP implements Runnable, Server {
 				while (it.hasNext()) {
 					SelectionKey key = (SelectionKey) it.next();
 
-					if ((key.readyOps() & SelectionKey.OP_ACCEPT) == SelectionKey.OP_ACCEPT) {
-
-						System.out.println("acc");
-						Socket s = serverSocket.accept();
-						System.out.println("Got connection from " + s);
-
-						SocketChannel sc = s.getChannel();
-						sc.configureBlocking(false);
-						sc.register(selector, SelectionKey.OP_READ);
-
-					} else if ((key.readyOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ) {
-						SocketChannel sc = null;
+					if ((key.readyOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ) {
+						DatagramChannel sc = null;
 
 						try {
-							sc = (SocketChannel) key.channel();
+							sc = (DatagramChannel) key.channel();
 							boolean ok = processInput(sc);
-							if (!ok) closeSocket(sc, key);
+							if (!ok)
+							//System.out.println("here");
+								closeSocket(sc, key);
 
 						} catch (IOException ie) {
 							closeSocket(sc, key);
@@ -90,10 +81,10 @@ public class StoreServerTCP implements Runnable, Server {
 		}
 	}
 	
-	private void closeSocket(SocketChannel sc, SelectionKey key) {
+	private void closeSocket(DatagramChannel sc, SelectionKey key) {
 		key.cancel();
 
-		Socket s = null;
+		DatagramSocket s = null;
 		try {
 			s = sc.socket();
 			s.close();
@@ -106,7 +97,7 @@ public class StoreServerTCP implements Runnable, Server {
 	}
 
 	
-	private boolean processInput(SocketChannel sc) throws IOException {
+	private boolean processInput(DatagramChannel sc) throws IOException {
 		buffer.clear();
 		sc.read(buffer);
 		buffer.flip();
@@ -155,7 +146,7 @@ public class StoreServerTCP implements Runnable, Server {
 
 	static public void main(String args[]) throws Exception {
 		int port = 1050;
-		new StoreServerTCP(port);
+		new StoreServerUDP(port);
 	}
 
 }
