@@ -1,6 +1,6 @@
 package messaging.network;
 
-import java.io.IOException;
+import java.io.IOException; 
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -12,7 +12,6 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import messaging.Decriptor;
 
@@ -123,7 +122,7 @@ public class StoreServerTCP implements Runnable, Server {
 		Random r = new Random();
 		int unicNumb = r.nextInt();
 
-		while (answers.containsKey(unicNumb))
+		while (answers.containsKey(unicNumb)|| unicNumb==-1)
 			unicNumb = r.nextInt();
 		decriptor.decript(message, unicNumb);
 

@@ -3,16 +3,14 @@ package messaging.network;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
-import java.net.Socket;
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
-import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import messaging.Decriptor;
 
@@ -37,11 +35,9 @@ public class StoreServerUDP implements Runnable, Server {
 		try {
 			DatagramChannel channel = DatagramChannel.open();
 			channel.configureBlocking(false);
-
 			DatagramSocket serverSocket = channel.socket();
 			InetSocketAddress isa = new InetSocketAddress(port);
 			serverSocket.bind(isa);
-
 			selector = Selector.open();
 
 			channel.register(selector, SelectionKey.OP_READ);
@@ -58,18 +54,21 @@ public class StoreServerUDP implements Runnable, Server {
 
 				while (it.hasNext()) {
 					SelectionKey key = (SelectionKey) it.next();
-
-					if ((key.readyOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ) {
+					 if ((key.readyOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ) {
 						DatagramChannel sc = null;
 
 						try {
+							
 							sc = (DatagramChannel) key.channel();
 							boolean ok = processInput(sc);
 							if (!ok)
-							//System.out.println("here");
+							{
+								System.out.println("here1");
 								closeSocket(sc, key);
+							}
 
 						} catch (IOException ie) {
+							System.out.println("here");
 							closeSocket(sc, key);
 						}
 					}
@@ -84,13 +83,14 @@ public class StoreServerUDP implements Runnable, Server {
 	private void closeSocket(DatagramChannel sc, SelectionKey key) {
 		key.cancel();
 
-		DatagramSocket s = null;
+//		DatagramSocket s = null;
+//		s = sc.socket();
+//		s.close();
 		try {
-			s = sc.socket();
-			s.close();
 			sc.close();
-		} catch (IOException ie) {
-			System.err.println("Error closing socket " + s + ": " + ie);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		System.out.println("Closed " + sc);
@@ -99,10 +99,12 @@ public class StoreServerUDP implements Runnable, Server {
 	
 	private boolean processInput(DatagramChannel sc) throws IOException {
 		buffer.clear();
-		sc.read(buffer);
+		SocketAddress sa = sc.receive(buffer);
+		//sc.read(buffer);
 		buffer.flip();
 
 		if (buffer.limit() == 0) {
+			System.out.println("NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
 			return false;
 		}
 
@@ -114,7 +116,7 @@ public class StoreServerUDP implements Runnable, Server {
 		Random r = new Random();
 		int unicNumb = r.nextInt();
 
-		while (answers.containsKey(unicNumb))
+		while (answers.containsKey(unicNumb) || unicNumb==-1)
 			unicNumb = r.nextInt();
 		decriptor.decript(message, unicNumb);
 
@@ -136,9 +138,9 @@ public class StoreServerUDP implements Runnable, Server {
 				}
 				break;
 			}
-
+		
 		buffer.flip();
-		sc.write(buffer);
+		sc.send(buffer, sa);
 
 		System.out.println("Processed " + buffer.limit() + " from " + sc);
 		return true;

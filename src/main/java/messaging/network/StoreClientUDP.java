@@ -1,19 +1,11 @@
 package messaging.network;
 
-import java.io.IOException; 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.ConnectException;
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.Socket;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
-import java.nio.channels.DatagramChannel;
-import java.util.LinkedList;
-import java.util.List;
+import java.net.PortUnreachableException;
+import java.net.SocketTimeoutException;
 import java.util.Random;
 
 import messaging.PackageGetter;
@@ -37,79 +29,85 @@ public class StoreClientUDP implements Runnable {
 			new Thread(this).start();
 		}
 	}
+
 //	private static ByteBuffer buff = ByteBuffer.allocate(1024);
+	private int numToWrite = 200;
+	private byte[] answer;
+	private DatagramPacket packet;
+	private DatagramSocket s;
 
 	public void run() {
 
 		byte buffer[];
 
 		try {
-			DatagramSocket s = new DatagramSocket();
-	//		DatagramChannel ch = s.getChannel();
-//			InputStream in = ch.getInputStream();
-//			OutputStream out = s.getOutputStream();
-			
+			s = new DatagramSocket();
+			s.connect(addr, port);
+
 			buffer = Client.generatePackage().getWholePackage();
-			
-			while (true) {
-				
-				boolean socketInterrapted = false;
-				 buffer = Client.generatePackage().getWholePackage();
-				 
-				// send request
-		        byte[] buf = new byte[256];
-		        
-		        DatagramPacket packet = new DatagramPacket(buf, buf.length, addr, port);
-		        s.send(packet);
 
-		        int numToWrite = 200;
-				byte[] answer = new byte[numToWrite];
-				int sofar = 0;
-				int preSofar = 0;
-		        // get response
-		        packet = new DatagramPacket(answer, numToWrite);
-		        s.receive(packet);
+			//while (true) {
+			for(int i=0; i<10;) {
 
-		        // display response
-		       // String received = new String(packet.getData(), 0, packet.getLength());
-		        PackageGetter pg ;
-		        try {
-					pg = new PackageGetter(answer);
-					System.out.println(Thread.currentThread() + " wrote "+ pg.getMessageString());
-				} catch (InjuredPackageException e) {
-					System.out.println("injured answer");
+				packet = new DatagramPacket(buffer, buffer.length);
+				s.send(packet);
+				System.out.println(Thread.currentThread().getName() +"Packet was sended");
+
+				answer = new byte[numToWrite];
+				packet = new DatagramPacket(answer, numToWrite);
+
+				Thread th = new Thread(new WaitForAnswer());
+				try {
+					th.start();
+					Thread.sleep(350);
+					th.stop();
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
 				}
-			//for(int i=0; i<10; i++) {
-				
+				if (answer[0] == 13) {
+					PackageGetter pg;
+					try {
+						pg = new PackageGetter(answer);
+						System.out.println(Thread.currentThread().getName() + " wrote " );
+						//+ pg.getMessageString());
+						
+					} catch (InjuredPackageException | NegativeArraySizeException | ArrayIndexOutOfBoundsException e) {
+						System.out.println("injured answer");
+					}
+					i++;
+					buffer = Client.generatePackage().getWholePackage();
 
+					int pause = minPause + (int) (rand.nextDouble() * (maxPause - minPause));
+					try {
+						Thread.sleep(pause);
+					} catch (InterruptedException ie) {
+						ie.printStackTrace();
+					}
+				}
 			}
-			
+
 		} catch (IOException ie) {
 			ie.printStackTrace();
-		} 
+		}
 	}
-	
-//	private Socket tryToGetConnection(Socket s) {
-//		try {
-//			s = new Socket(host, port);
-//		} catch (ConnectException e){
-//			System.out.println(Thread.currentThread() + " No connection");
-//			s= tryToGetConnection(s);
-//		} catch (UnknownHostException e) {
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		if (s==null) tryToGetConnection(s);
-//		
-//		return s;
-//	}
+
+	class WaitForAnswer implements Runnable {
+
+		@Override
+		public void run() {
+			try {
+				s.receive(packet);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+	}
 
 	static public void main(String args[]) throws Exception {
 		InetAddress addr = InetAddress.getByName(null);
-		//String host = addr.getHostAddress();
 		int port = 1050;
-		int numThreads = 1;
+		int numThreads = 700;
 
 		new StoreClientUDP(addr, port, numThreads);
 	}

@@ -1,15 +1,12 @@
 package messaging.network;
 
-import java.io.IOException; 
+import java.io.IOException;  
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
 
 import messaging.PackageGetter;

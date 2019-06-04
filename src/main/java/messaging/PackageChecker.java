@@ -9,7 +9,7 @@ public class PackageChecker {
   
 	public PackageChecker(byte[] message, int length) {
 		if(message == null) throw new NullPointerException();
-		if(message.length<18){
+		if(message.length<26){
 			correctContent=false;
 			correctDescription=false;
 		} else {

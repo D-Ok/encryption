@@ -34,9 +34,9 @@ public class Decriptor {
 			try {
 				PackageGetter pg= new PackageGetter(message);
 				processor.process(new Message(pg.getcType(), pg.getbUserId(), pg.getMessageJson()), num);
-			} catch (InjuredPackageException e) {
-				byte[] ans = {0};
-				Server.setAnswer(num, ans);
+			} catch (InjuredPackageException | NegativeArraySizeException | ArrayIndexOutOfBoundsException e) {
+				
+				processor.encriptor.encryption(new Message(0, 0, "Your messaje was injured"), num);
 			}
 		}
 		
