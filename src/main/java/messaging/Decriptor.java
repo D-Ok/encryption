@@ -5,6 +5,7 @@ import java.util.concurrent.Executors;
 
 import messaging.exceptions.InjuredPackageException;
 import messaging.network.Server;
+import messaging.network.StoreServerTCP;
 
 public class Decriptor {
 	
@@ -34,7 +35,8 @@ public class Decriptor {
 				PackageGetter pg= new PackageGetter(message);
 				processor.process(new Message(pg.getcType(), pg.getbUserId(), pg.getMessageJson()), num);
 			} catch (InjuredPackageException e) {
-				e.printStackTrace();
+				byte[] ans = {0};
+				StoreServerTCP.setAnswer(num, ans);
 			}
 		}
 		

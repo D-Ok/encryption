@@ -23,7 +23,7 @@ public class PackageGetter {
 	
 	public PackageGetter(byte[] wholeMessage) throws InjuredPackageException{
 		if(wholeMessage == null) throw new NullPointerException();
-		
+		if(wholeMessage.length<18) throw new InjuredPackageException();
 		byte[] len= new byte[4];
 		for(int i=10, l=0; i<14; i++, l++)  
 			len[l]=wholeMessage[i];

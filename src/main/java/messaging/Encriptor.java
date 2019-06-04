@@ -10,12 +10,12 @@ import java.util.concurrent.Executors;
 
 public class Encriptor {
 	
-	private final Sender sender;
+	//private final Sender sender;
 	private final byte bSrc = 1;
 	private ExecutorService ex;
 	
 	public Encriptor() {
-		sender = new Sender();
+		//sender = new Sender();
 		ex = Executors.newFixedThreadPool(3);
 	}
 	
