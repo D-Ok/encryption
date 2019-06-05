@@ -2,6 +2,8 @@ package messaging;
 
 import java.net.InetAddress;
 
+import javax.crypto.BadPaddingException;
+
 import messaging.exceptions.InjuredPackageException;
 
 public class Sender {
@@ -11,7 +13,7 @@ public class Sender {
 		try {
 			pg = new PackageGetter(mess);
 			System.out.println("\nSending message:\n"+pg.toString());
-		} catch (InjuredPackageException e) {
+		} catch (InjuredPackageException | BadPaddingException e) {
 			e.printStackTrace();
 		}
 	}

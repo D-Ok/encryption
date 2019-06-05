@@ -18,10 +18,8 @@ public class StoreServerUDP implements Runnable, Server {
 	// The port we will listen on
 	private int port;
 	private Decriptor decriptor;
-
 	// A pre-allocated buffer for encrypting data
 	private static ByteBuffer buffer = ByteBuffer.allocate(1024);
-	
 	public StoreServerUDP(int port) {
 		this.port = port;
 		decriptor = new Decriptor();
@@ -61,17 +59,13 @@ public class StoreServerUDP implements Runnable, Server {
 							
 							sc = (DatagramChannel) key.channel();
 							boolean ok = processInput(sc);
-							if (!ok)
-							{
-								System.out.println("here1");
-								closeSocket(sc, key);
-							}
 
 						} catch (IOException ie) {
 							System.out.println("here");
 							closeSocket(sc, key);
 						}
 					}
+					 it.remove();
 				}
 				keys.clear();
 			}
@@ -104,7 +98,6 @@ public class StoreServerUDP implements Runnable, Server {
 		buffer.flip();
 
 		if (buffer.limit() == 0) {
-			System.out.println("NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
 			return false;
 		}
 

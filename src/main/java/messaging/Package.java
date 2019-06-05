@@ -198,7 +198,7 @@ public class Package {
         
 	  }
 	
-	public static synchronized String decryptMessage(byte[] mess) {
+	public static synchronized String decryptMessage(byte[] mess) throws BadPaddingException {
 //		  try {
 //			if(cipher == null) initializeCipher();
 //			if(key == null) initializeKey();
@@ -222,7 +222,7 @@ public class Package {
 		        byte[] decrypted = cipher.doFinal(mess);
 		        String result = new String(decrypted);
 		        return result;
-		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException e) {
 			e.printStackTrace();
 		}
        return null;

@@ -9,6 +9,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Random;
 
+import javax.crypto.BadPaddingException;
+
 import messaging.PackageGetter;
 import messaging.exceptions.InjuredPackageException;
 
@@ -83,7 +85,7 @@ public class StoreClientTCP implements Runnable {
 					try {
 						pg = new PackageGetter(answer);
 						System.out.println(Thread.currentThread() + " wrote "+ pg.getMessageString());
-					} catch (InjuredPackageException e) {
+					} catch (InjuredPackageException | BadPaddingException e) {
 						System.out.println("injured answer");
 					}
 
@@ -132,7 +134,7 @@ public class StoreClientTCP implements Runnable {
 		InetAddress addr = InetAddress.getByName(null);
 		String host = addr.getHostAddress();
 		int port = 1050;
-		int numThreads = 1000;
+		int numThreads = 1;
 
 		new StoreClientTCP(host, port, numThreads);
 	}

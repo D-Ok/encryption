@@ -2,6 +2,8 @@ package messaging;
 
 import java.nio.ByteBuffer;
 
+import javax.crypto.BadPaddingException;
+
 //import junit.framework.Test;
 //import junit.framework.TestCase;
 //import junit.framework.TestSuite;
@@ -181,7 +183,12 @@ public class AppTest {
     	String message = "some information";
     	byte[] encrypted = Package.encryptMessage(message);
     	
-    	Assert.assertEquals(message, Package.decryptMessage(encrypted));
+    	try {
+			Assert.assertEquals(message, Package.decryptMessage(encrypted));
+		} catch (BadPaddingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 }
 

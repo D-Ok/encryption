@@ -3,6 +3,8 @@ package messaging;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.crypto.BadPaddingException;
+
 import messaging.exceptions.InjuredPackageException;
 import messaging.network.Server;
 import messaging.network.StoreServerTCP;
@@ -34,7 +36,7 @@ public class Decriptor {
 			try {
 				PackageGetter pg= new PackageGetter(message);
 				processor.process(new Message(pg.getcType(), pg.getbUserId(), pg.getMessageJson()), num);
-			} catch (InjuredPackageException | NegativeArraySizeException | ArrayIndexOutOfBoundsException e) {
+			} catch (InjuredPackageException | NegativeArraySizeException | ArrayIndexOutOfBoundsException | BadPaddingException e) {
 				
 				processor.encriptor.encryption(new Message(0, 0, "Your messaje was injured"), num);
 			}

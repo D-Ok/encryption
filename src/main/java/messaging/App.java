@@ -3,6 +3,8 @@ package messaging;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.crypto.BadPaddingException;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -97,7 +99,7 @@ public class App {
 					return pG;
 				} catch (InjuredPackageException e) {
 					System.out.println("Package was injured");
-				} catch (NullPointerException e) {
+				} catch (NullPointerException | BadPaddingException e) {
 					System.out.println("Argyment can`t be null");
 				}
 				return null;

@@ -2,6 +2,8 @@ package messaging;
 
 import java.nio.ByteBuffer;
 
+import javax.crypto.BadPaddingException;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -21,7 +23,7 @@ public class PackageGetter {
 	private String messageString;
 	private JsonElement messageJson;
 	
-	public PackageGetter(byte[] wholeMessage) throws InjuredPackageException{
+	public PackageGetter(byte[] wholeMessage) throws InjuredPackageException, BadPaddingException{
 		if(wholeMessage == null) throw new NullPointerException();
 		if(wholeMessage.length<18) throw new InjuredPackageException();
 		byte[] len= new byte[4];
