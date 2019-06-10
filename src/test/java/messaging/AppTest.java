@@ -16,6 +16,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
+import messaging.exceptions.InvalidCharacteristicOfGoodsException;
 import messaging.warehouse.Database;
 import messaging.warehouse.Good;
 import messaging.warehouse.Group;
@@ -31,14 +32,18 @@ public class AppTest {
 		String goodName = "Unit";
 		db.deleteGroup(groupName);
 		db.createGroup(groupName);
-		db.createGoods(goodName, groupName, "smb", 20.2);
-		
-		LinkedList<Group> l = db.getAllGroups();
-		Assert.assertTrue(consistGroup(l, groupName));
-		
-		LinkedList<Good> list = db.getAllGoods();
-		Assert.assertTrue(consistGood(list, goodName));
+		try {
+			db.createGoods(goodName, groupName, "smb", 20.2);
 
+			LinkedList<Group> l = db.getAllGroups();
+			Assert.assertTrue(consistGroup(l, groupName));
+			
+			LinkedList<Good> list = db.getAllGoods();
+			Assert.assertTrue(consistGood(list, goodName));
+			
+		} catch (InvalidCharacteristicOfGoodsException e) {
+			e.printStackTrace();
+		}
 		db.deleteGroup(groupName);
 	}
 	
@@ -50,7 +55,11 @@ public class AppTest {
 		String goodName = "Unit";
 		db.deleteGroup(groupName);
 		db.createGroup(groupName);
-		db.createGoods(goodName, groupName, "smb", 20.2);
+		try {
+			db.createGoods(goodName, groupName, "smb", 20.2);
+		} catch (InvalidCharacteristicOfGoodsException e) {
+			e.printStackTrace();
+		}
 		
 		db.deleteGroup(groupName);
 		LinkedList<Group> l = db.getAllGroups();
@@ -83,21 +92,24 @@ public class AppTest {
 		String goodName = "Unit";
 		db.deleteGroup(groupName);
 		db.createGroup(groupName);
-		db.createGoods(goodName, groupName, "smb", 20.2);
+		try {
+			db.createGoods(goodName, groupName, "smb", 20.2);
+			String description = "des";
+			db.updateDescriptionOfGood(goodName, description);
+			String producer = "prod";
+			db.updateProducer(goodName, producer);
+			double price =33.3;
+			db.setPrice(goodName, price);
+			
+			Good g = db.getGood(goodName);
+			
+			Assert.assertEquals(description, g.getDescription());
+			Assert.assertEquals(producer, g.getProducer());
+			Assert.assertTrue(price == g.getPrice());
+		} catch (InvalidCharacteristicOfGoodsException e) {
+			e.printStackTrace();
+		}
 		
-		String description = "des";
-		db.updateDescriptionOfGood(goodName, description);
-		String producer = "prod";
-		db.updateProducer(goodName, producer);
-		double price =33.3;
-		db.setPrice(goodName, price);
-		
-		Good g = db.getGood(goodName);
-		
-		Assert.assertEquals(description, g.getDescription());
-		Assert.assertEquals(producer, g.getProducer());
-		Assert.assertTrue(price == g.getPrice());
-
 		db.deleteGroup(groupName);
 	}
 	
@@ -108,15 +120,19 @@ public class AppTest {
 		String goodName = "Unit";
 		db.deleteGroup(groupName);
 		db.createGroup(groupName);
-		db.createGoods(goodName, groupName, "smb", 20.2);
-		
-		db.addGoods(goodName, 50);
-		Assert.assertEquals(50, db.getQuontityOfGoods(goodName));
-		db.removeGoods(goodName, 50);
-		Assert.assertEquals(0, db.getQuontityOfGoods(goodName));
-		db.removeGoods(goodName, 50);
-		Assert.assertEquals(0, db.getQuontityOfGoods(goodName));
+		try {
+			db.createGoods(goodName, groupName, "smb", 20.2);
+			db.addGoods(goodName, 50);
+			Assert.assertEquals(50, db.getQuontityOfGoods(goodName));
+			db.removeGoods(goodName, 50);
+			Assert.assertEquals(0, db.getQuontityOfGoods(goodName));
+			db.removeGoods(goodName, 50);
+			Assert.assertEquals(0, db.getQuontityOfGoods(goodName));
 
+		} catch (InvalidCharacteristicOfGoodsException e) {
+			e.printStackTrace();
+		}	
+		
 		db.deleteGroup(groupName);
 	}
 	

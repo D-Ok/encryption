@@ -30,7 +30,7 @@ public class App {
 		   		  String[] groupG = {"buckwheat", "fig","bulgur"};
 		   		  String[] groupD = {"milk", "cheese", "butter"};
 		   		  
-		   		  System.out.println("Before commands: \n"+Processor.warehouse.toString());
+		   		  //System.out.println("Before commands: \n"+Processor.warehouse.toString());
 		   		
 		   		  JsonObject jo = new JsonObject();
 		   		  jo.addProperty("nameOfGroup", groups[1]);

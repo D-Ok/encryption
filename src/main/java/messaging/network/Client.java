@@ -12,8 +12,7 @@ public class Client {
 	private static final Random random = new Random();
 	
 	private static String[] groups = {"groats", "dairy"};
-	private static String[] groupG = {"buckwheat", "fig","bulgur"};
-	private static String[] groupD = {"milk", "cheese", "butter"};
+	private static String[] goods = {"buckwheat", "fig","bulgur", "milk", "cheese", "butter"};
 	
 	public static Package generatePackage()
 	{
@@ -24,22 +23,16 @@ public class Client {
 		switch (cType) {
 		case 0:
 			int j = random.nextInt(2);
-			jo.addProperty("nameOfGroup", groups[j]);
-			if(j==0) jo.addProperty("nameOfGoods", groupG[random.nextInt(3)]);
-			else jo.addProperty("nameOfGoods", groupD[random.nextInt(3)]);
+			jo.addProperty("nameOfGoods", goods[random.nextInt(6)]);
 			break;
 		case 1 :
 			j = random.nextInt(2);
-			jo.addProperty("nameOfGroup", groups[j]);
-			if(j==0) jo.addProperty("nameOfGoods", groupG[random.nextInt(3)]);
-			else jo.addProperty("nameOfGoods", groupD[random.nextInt(3)]);
+			jo.addProperty("nameOfGoods", goods[random.nextInt(6)]);
 			jo.addProperty("quantity", random.nextInt(201));
 			break;
 		case 2:
 			j = random.nextInt(2);
-			jo.addProperty("nameOfGroup", groups[j]);
-			if(j==0) jo.addProperty("nameOfGoods", groupG[random.nextInt(3)]);
-			else jo.addProperty("nameOfGoods", groupD[random.nextInt(3)]);
+			jo.addProperty("nameOfGoods", goods[random.nextInt(6)]);
 			jo.addProperty("quantity", random.nextInt(201));
 			break;
 		case 3:
@@ -48,12 +41,12 @@ public class Client {
 		case 4:
 			jo.addProperty("nameOfGroup", groups[random.nextInt(2)]);
 			jo.addProperty("nameOfGoods", "good"+random.nextInt(1000));
+			jo.addProperty("price", random.nextInt(9000)/10);
+			jo.addProperty("quantity", random.nextInt(1000));
 			break;
 		case 5:
 			j = random.nextInt(2);
-			jo.addProperty("nameOfGroup", groups[j]);
-			if(j==0) jo.addProperty("nameOfGoods", groupG[random.nextInt(3)]);
-			else jo.addProperty("nameOfGoods", groupD[random.nextInt(3)]);
+			jo.addProperty("nameOfGoods", goods[random.nextInt(6)]);
 			jo.addProperty("price", random.nextInt(9000)/10);
 			break;
 		default:

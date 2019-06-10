@@ -59,7 +59,8 @@ public class Database  {
 		}
 	}
 	
-	public void createGoods(String nameOfGoods, String nameOfGroup, String description, String producer, int quontity, double price) {
+	public void createGoods(String nameOfGoods, String nameOfGroup, String description, String producer, int quontity, double price) throws InvalidCharacteristicOfGoodsException { 
+		if(quontity<0 || price<=0 ) throw new InvalidCharacteristicOfGoodsException("Ucorrect parameters");
 		try {
 	    	PreparedStatement ps = connection.prepareStatement("Insert into `goods` (`name`, `description`, `price`, `quontity`, `producer`, `groupName`) values (?, ?, ?, ?, ?, ?)");
 	    	ps.setString(1, nameOfGoods);
@@ -77,7 +78,8 @@ public class Database  {
 		}
 	}
 	
-	public void createGoods(String nameOfGoods, String nameOfGroup, String producer, int quontity, double price) {
+	public void createGoods(String nameOfGoods, String nameOfGroup, String producer, int quontity, double price) throws InvalidCharacteristicOfGoodsException {
+		if(quontity<0 || price<=0 ) throw new InvalidCharacteristicOfGoodsException("Ucorrect parameters");
 		try {
 	    	PreparedStatement ps = connection.prepareStatement("Insert into `goods` (`name`, `price`, `quontity`, `producer`, `groupName`) values (?, ?, ?, ?, ?)");
 	    	ps.setString(1, nameOfGoods);
@@ -94,7 +96,8 @@ public class Database  {
 		}
 	}
 	
-	public void createGoods(String nameOfGoods, String nameOfGroup, String producer, double price) {
+	public void createGoods(String nameOfGoods, String nameOfGroup, String producer, double price) throws InvalidCharacteristicOfGoodsException {
+		if(price<=0 ) throw new InvalidCharacteristicOfGoodsException("Ucorrect parameters");
 		try {
 	    	PreparedStatement ps = connection.prepareStatement("Insert into `goods` (`name`, `price`, `quontity`, `producer`, `groupName`) values (?, ?, ?, ?, ?)");
 	    	ps.setString(1, nameOfGoods);
@@ -168,7 +171,7 @@ public class Database  {
 		}
 	}
 	
-	public void removeGoods(String nameOfGood, int quontity){
+	public void removeGoods(String nameOfGood, int quontity) throws InvalidCharacteristicOfGoodsException{
 		String command = "SELECT * FROM goods WHERE goods.name='"+nameOfGood+"'";
 		try {
 			Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
@@ -178,7 +181,10 @@ public class Database  {
 	    		if(old-quontity>=0) {
 			    	rs.updateInt("quontity", old-quontity);
 			    	rs.updateRow();
-	    		} else System.out.println("Can`t remove more than "+old);
+	    		} else {
+	    			rs.close();
+	    			throw new InvalidCharacteristicOfGoodsException("Can`t remove products.");
+	    		}
 	    	}
 	    	rs.close();
 	    	statement.close();
@@ -280,8 +286,8 @@ public class Database  {
 		update(str);
 	}
 	
-	public void setPrice(String nameOfGood, double price){
-		if(price<=0) System.out.println("Price must be > 0");
+	public void setPrice(String nameOfGood, double price) throws InvalidCharacteristicOfGoodsException{
+		if(price<=0) throw new InvalidCharacteristicOfGoodsException("Price must be > 0");
 		else {
 			String s = "update `goods` set `price`='"+price+"' where `name`='"+nameOfGood+"'";
 			update(s);

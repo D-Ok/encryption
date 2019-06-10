@@ -3,16 +3,21 @@ package messaging;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.commons.codec.net.QuotedPrintableCodec;
+
 import messaging.exceptions.InvalidCharacteristicOfGoodsException;
+import messaging.warehouse.Database;
 import messaging.warehouse.Warehouse;
 
 public class Processor {
 
-	public static final Warehouse warehouse = new Warehouse();
+	//public static final Warehouse warehouse = new Warehouse();
 	final Encriptor encriptor;
 	private ExecutorService ex;
+	private final Database db;
 
 	public Processor() {
+		db = new Database();
 		encriptor = new Encriptor();
 		ex = Executors.newFixedThreadPool(3);
 	}
@@ -45,36 +50,36 @@ public class Processor {
 				switch (message.getcType()) {
 				case 0:
 					info = "Quantity of " + goods + " in the group " + group + ": "
-							+ warehouse.getQuantityOfGoods(group, goods);
+							+ db.getQuontityOfGoods(goods);
 					break;
 				case 1:
 					try {
-						warehouse.removeGoods(group, goods, quantity);
+						db.removeGoods(goods, quantity);
 						info = "Was removed " + goods + " in the group " + group + ": " + quantity;
-					} catch (InvalidCharacteristicOfGoodsException e) {
-						info = "Error: " + e.getMessage();
+					} catch (InvalidCharacteristicOfGoodsException e1) {
+						info = "Error: " + e1.toString();
 					}
+					
 					break;
 				case 2:
-					try {
-						warehouse.addGoods(group, goods, quantity);
-						info = "Was added " + goods + " in the group " + group + " quantity: " + quantity;
-					} catch (InvalidCharacteristicOfGoodsException e) {
-						info = "Error: " + e.getMessage();
-					}
-
+					db.addGoods(goods, quantity);
+					info = "Was added " + goods + " in the group " + group + " quantity: " + quantity;
 					break;
 				case 3:
-					warehouse.addGroup(group);
+					db.createGroup(group);
 					info = "Was added group " + group;
 					break;
 				case 4:
-					warehouse.addNameOfGoodtToGroup(group, goods);
-					info = "Was added goods with name " + goods.toString() + " to the group " + group;
+					try {
+						db.createGoods(goods, group, "none", quantity, price);
+						info = "Was added goods with name " + goods.toString() + " to the group " + group;
+					} catch (InvalidCharacteristicOfGoodsException e1) {
+						info = "Error: " + e1.toString();
+					}
 					break;
 				case 5:
 					try {
-						warehouse.setPrice(group, goods, price);
+						db.setPrice(goods, price);
 						info = "To the " + goods + " in the group " + group + " was set price: " + price;
 					} catch (InvalidCharacteristicOfGoodsException e) {
 						info = "Error: " + e.getMessage();
