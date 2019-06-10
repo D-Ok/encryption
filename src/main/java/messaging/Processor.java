@@ -1,13 +1,12 @@
 package messaging;
 
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ExecutorService; 
 import java.util.concurrent.Executors;
 
 import org.apache.commons.codec.net.QuotedPrintableCodec;
 
 import messaging.exceptions.InvalidCharacteristicOfGoodsException;
 import messaging.warehouse.Database;
-import messaging.warehouse.Warehouse;
 
 public class Processor {
 

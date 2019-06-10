@@ -1,6 +1,6 @@
 package messaging;
  
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ExecutorService; 
 import java.util.concurrent.Executors;
 
 import javax.crypto.BadPaddingException;
@@ -11,69 +11,16 @@ import com.google.gson.JsonObject;
 import messaging.exceptions.ArgumentException;
 import messaging.exceptions.InjuredPackageException;
 import messaging.exceptions.NoMessageException;
-import messaging.warehouse.Warehouse;
 
 public class App {
 	
 	private volatile static Receiver r = new Receiver();
 		   	  public static void main(String[] args) {
 		   		 // generateMessages(100000);
-		   		  checkQuantity();
 		   		  
 		   	  }
 		   	  
-		   	  public static void checkQuantity(){
-		 		  
-		   		  Decriptor dec = new Decriptor();
-		   		  
-		   		  String[] groups = {"groats", "dairy"};
-		   		  String[] groupG = {"buckwheat", "fig","bulgur"};
-		   		  String[] groupD = {"milk", "cheese", "butter"};
-		   		  
-		   		  //System.out.println("Before commands: \n"+Processor.warehouse.toString());
-		   		
-		   		  JsonObject jo = new JsonObject();
-		   		  jo.addProperty("nameOfGroup", groups[1]);
-		   		  jo.addProperty("nameOfGoods", groupD[1]);
-		   		  jo.addProperty("quantity", 200);
-		   		  sendMess(jo, dec, Warehouse.CommandTypes.AddGoods.ordinal());
-		   		  
-		   		  jo = new JsonObject();
-		   		  jo.addProperty("nameOfGroup", groups[1]);
-		   		  jo.addProperty("nameOfGoods", groupD[1]);
-		   		  jo.addProperty("quantity", 100);
-		   		  sendMess(jo, dec, Warehouse.CommandTypes.AddGoods.ordinal());
-		   		  
-		   	   	  jo = new JsonObject();
-		   		  jo.addProperty("nameOfGroup", groups[1]);
-		   		  jo.addProperty("nameOfGoods", groupD[1]);
-		   		  jo.addProperty("quantity", 200);
-		   		  sendMess(jo, dec, Warehouse.CommandTypes.AddGoods.ordinal());
-		   		  
-		   		  jo = new JsonObject();
-		   		  jo.addProperty("nameOfGroup", groups[1]);
-		   		  jo.addProperty("nameOfGoods", groupD[1]);
-		   		  jo.addProperty("quantity", 1000);
-		   		  sendMess(jo, dec, Warehouse.CommandTypes.CellGoods.ordinal());
-		   		  
-		   		  jo = new JsonObject();
-		   		  jo.addProperty("nameOfGroup", groups[1]);
-		   		  jo.addProperty("nameOfGoods", groupD[1]);
-		   		  jo.addProperty("quantity", 400);
-		   		  sendMess(jo, dec, Warehouse.CommandTypes.CellGoods.ordinal());
-		   		  
-		   		  jo = new JsonObject();
-		   		  jo.addProperty("nameOfGroup", groups[1]);
-		   		  jo.addProperty("nameOfGoods", groupD[1]);
-		   		  jo.addProperty("quantity", 300);
-		   		  sendMess(jo, dec, Warehouse.CommandTypes.AddGoods.ordinal());
-		   		  
-		   		  jo = new JsonObject();
-		   		  jo.addProperty("nameOfGroup", groups[1]);
-		   		  jo.addProperty("nameOfGoods", groupD[1]);
-		   		  jo.addProperty("quantity", 1000);
-		   		  sendMess(jo, dec, Warehouse.CommandTypes.CellGoods.ordinal());
-		   	  }
+		   	
 		   	  
 		   	  public static void sendMess(JsonObject jo, Decriptor dec, int cType) {
 		   		  try {
