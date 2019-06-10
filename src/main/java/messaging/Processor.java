@@ -86,7 +86,7 @@ public class Processor {
 			} catch (NullPointerException e) {
 				info="Your message was injured or uncorrect";
 			}
-			encriptor.encryption(new Message(cType, userId, info), num);
+			encriptor.encryption(new Message(cType, userId, info, message.getUnicNumberOfMessage()), num);
 		}
 	}
 }

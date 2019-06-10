@@ -35,10 +35,10 @@ public class Decriptor {
 		public void run() {
 			try {
 				PackageGetter pg= new PackageGetter(message);
-				processor.process(new Message(pg.getcType(), pg.getbUserId(), pg.getMessageJson()), num);
+				processor.process(new Message(pg.getcType(), pg.getbUserId(), pg.getMessageJson(), pg.getbPktId()), num);
 			} catch (InjuredPackageException | NegativeArraySizeException | ArrayIndexOutOfBoundsException | BadPaddingException e) {
 				
-				processor.encriptor.encryption(new Message(0, 0, "Your messaje was injured"), num);
+				processor.encriptor.encryption(new Message(0, 0, "Your messaje was injured", 0), num);
 			}
 		}
 		

@@ -4,9 +4,15 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.HashMap;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.crypto.BadPaddingException;
+
+import org.xml.sax.HandlerBase;
+
+import com.google.gson.JsonObject;
 
 import messaging.PackageGetter;
 import messaging.exceptions.InjuredPackageException;
@@ -18,6 +24,8 @@ public class StoreClientUDP implements Runnable {
 	// Bounds on how long we wait between cycles
 	private static final int minPause = (int) (0.05 * 1000);
 	private static final int maxPause = (int) (0.5 * 1000);
+
+	private static ConcurrentHashMap<Long, byte[]> messages = new ConcurrentHashMap<Long, byte[]>();
 	Random rand = new Random();
 
 	public StoreClientUDP(InetAddress addr, int port, int numThreads) {
@@ -33,22 +41,31 @@ public class StoreClientUDP implements Runnable {
 	private byte[] answer;
 	private DatagramPacket packet;
 	private DatagramSocket s;
+	private static int n = 0;
 
 	public void run() {
 
 		byte buffer[];
-		int numberOfTry = 0;
 		try {
-			s = new DatagramSocket();
+			s = new DatagramSocket(n);
+			n++;
 			s.connect(addr, port);
 
 			buffer = Client.generatePackage().getWholePackage();
 
-			//while (true) {
-			for(int i=0; i<10;) {
-
+			// while (true) {
+			for (int i = 0; i < 10;) {
+				
 				packet = new DatagramPacket(buffer, buffer.length);
 				s.send(packet);
+				try {
+					PackageGetter p = new PackageGetter(buffer);
+					messages.put(p.getbPktId(), buffer);
+					System.out.println(" send " + p.getbPktId());
+				} catch (InjuredPackageException | NegativeArraySizeException | ArrayIndexOutOfBoundsException
+						| BadPaddingException  e2) {
+					//e2.printStackTrace();
+				} 
 				answer = new byte[numToWrite];
 				packet = new DatagramPacket(answer, numToWrite);
 
@@ -57,40 +74,40 @@ public class StoreClientUDP implements Runnable {
 					th.start();
 					Thread.sleep(timeToWait);
 					th.stop();
-				
-				if (answer[0] == 13) {
-					PackageGetter pg;
-					try {
-						pg = new PackageGetter(answer);
-						System.out.println(Thread.currentThread().getName() + " wrote " + pg.getMessageString());
+
+					if (answer[0] == 13) {
+						PackageGetter pg;
+						try {
+							pg = new PackageGetter(answer);
+							JsonObject jo = (JsonObject) pg.getMessageJson();
+							long num = jo.get("unicNumber").getAsLong();
+							if (messages.containsKey(num)) {
+								System.out.println( " wrote " + num);
+								messages.remove(num);
+								i++;
+								buffer = Client.generatePackage().getWholePackage();
+							} else {
+								System.out.println("No answer. Try to send packege again "+num);
+								}
+						} catch (InjuredPackageException | NegativeArraySizeException | ArrayIndexOutOfBoundsException
+								| BadPaddingException e) {
+							System.out.println("injured answer");
+						}
 						
-					} catch (InjuredPackageException | NegativeArraySizeException | ArrayIndexOutOfBoundsException | BadPaddingException e) {
-						System.out.println("injured answer");
+						int pause = minPause + (int) (rand.nextDouble() * (maxPause - minPause));
+						try {
+							Thread.sleep(pause);
+						} catch (InterruptedException ie) {
+							ie.printStackTrace();
+						}
+					} else {
+						System.out.println(Thread.currentThread().getName() + "No answer. Try to send packege again ");
 					}
-					i++;
-					buffer = Client.generatePackage().getWholePackage();
-					//numberOfTry=0;
-					int pause = minPause + (int) (rand.nextDouble() * (maxPause - minPause));
-					try {
-						Thread.sleep(pause);
-					} catch (InterruptedException ie) {
-						ie.printStackTrace();
-					}
-				} else {
-//					numberOfTry++;
-//					if(numberOfTry<10)
-					System.out.println(Thread.currentThread().getName() +"No answer. Try to send packege again ");
-//					else {
-//						numberOfTry=0;
-//						buffer = Client.generatePackage().getWholePackage();
-//						System.out.println(Thread.currentThread().getName() +"New message");
-//					}
-				}
-				
+
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
-				
+
 			}
 
 		} catch (IOException ie) {
@@ -111,13 +128,14 @@ public class StoreClientUDP implements Runnable {
 
 	}
 
-	private static int timeToWait=300;
+	private static int timeToWait = 10;
 
 	static public void main(String args[]) throws Exception {
 		InetAddress addr = InetAddress.getByName(null);
 		int port = 1050;
-		int numThreads = 100;
-		if(numThreads>=300) timeToWait=(numThreads/200)*numThreads;
+		int numThreads = 10;
+//		if (numThreads >= 300)
+//			timeToWait = (numThreads / 200) * numThreads;
 
 		new StoreClientUDP(addr, port, numThreads);
 	}

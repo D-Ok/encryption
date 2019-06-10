@@ -1,6 +1,7 @@
 package messaging;
 
 import java.nio.ByteBuffer;
+import java.util.LinkedList;
 
 import javax.crypto.BadPaddingException;
 
@@ -13,79 +14,113 @@ import org.junit.Test;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import messaging.exceptions.ArgumentException;
-import messaging.exceptions.NoMessageException;
-import messaging.warehouse.Warehouse;
+import messaging.warehouse.Database;
+import messaging.warehouse.Good;
+import messaging.warehouse.Group;
 
 public class AppTest {
 	
-	@Test
-	public void testRightQuantity() {
-		Decriptor dec = new Decriptor();
- 		  
- 		  String[] groups = {"groats", "dairy"};
- 		  String[] groupG = {"buckwheat", "fig","bulgur"};
- 		  String[] groupD = {"milk", "cheese", "butter"};
- 		  
- 		  System.out.println("Before commands: \n"+Processor.warehouse.toString());
- 		
- 		  JsonObject jo = new JsonObject();
- 		  jo.addProperty("nameOfGroup", groups[1]);
- 		  jo.addProperty("nameOfGoods", groupD[1]);
- 		  jo.addProperty("quantity", 200);
- 		  App.sendMess(jo, dec, Warehouse.CommandTypes.AddGoods.ordinal());
- 		  
- 		  jo = new JsonObject();
- 		  jo.addProperty("nameOfGroup", groups[1]);
- 		  jo.addProperty("nameOfGoods", groupD[1]);
- 		  jo.addProperty("quantity", 100);
- 		 App.sendMess(jo, dec, Warehouse.CommandTypes.AddGoods.ordinal());
- 		  
- 	   	  jo = new JsonObject();
- 		  jo.addProperty("nameOfGroup", groups[1]);
- 		  jo.addProperty("nameOfGoods", groupD[1]);
- 		  jo.addProperty("quantity", 200);
- 		 App.sendMess(jo, dec, Warehouse.CommandTypes.AddGoods.ordinal());
- 		  
- 		  jo = new JsonObject();
- 		  jo.addProperty("nameOfGroup", groups[1]);
- 		  jo.addProperty("nameOfGoods", groupD[1]);
- 		  jo.addProperty("quantity", 1000);
- 		 App.sendMess(jo, dec, Warehouse.CommandTypes.CellGoods.ordinal());
- 		  
- 		  jo = new JsonObject();
- 		  jo.addProperty("nameOfGroup", groups[1]);
- 		  jo.addProperty("nameOfGoods", groupD[1]);
- 		  jo.addProperty("quantity", 400);
- 		 App.sendMess(jo, dec, Warehouse.CommandTypes.CellGoods.ordinal());
- 		  
- 		  jo = new JsonObject();
- 		  jo.addProperty("nameOfGroup", groups[1]);
- 		  jo.addProperty("nameOfGoods", groupD[1]);
- 		  jo.addProperty("quantity", 300);
- 		 App.sendMess(jo, dec, Warehouse.CommandTypes.AddGoods.ordinal());
- 		  
- 		  jo = new JsonObject();
- 		  jo.addProperty("nameOfGroup", groups[1]);
- 		  jo.addProperty("nameOfGoods", groupD[1]);
- 		  jo.addProperty("quantity", 1000);
- 		 App.sendMess(jo, dec, Warehouse.CommandTypes.CellGoods.ordinal());
-		try {
-			Thread.sleep(1500);
-			int quantity = Processor.warehouse.getQuantityOfGoods(groups[1], groupD[1]);
-			Assert.assertEquals(300, quantity);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+
+	
+	@Test 
+	public void testDatabaseCreating() {
+		Database db = new Database();
+		String groupName = "UnitTest";
+		String goodName = "Unit";
+		db.deleteGroup(groupName);
+		db.createGroup(groupName);
+		db.createGoods(goodName, groupName, "smb", 20.2);
+		
+		LinkedList<Group> l = db.getAllGroups();
+		Assert.assertTrue(consistGroup(l, groupName));
+		
+		LinkedList<Good> list = db.getAllGoods();
+		Assert.assertTrue(consistGood(list, goodName));
+
+		db.deleteGroup(groupName);
+	}
+	
+	
+	@Test 
+	public void testDatabaseDeleting() {
+		Database db = new Database();
+		String groupName = "UnitTest";
+		String goodName = "Unit";
+		db.deleteGroup(groupName);
+		db.createGroup(groupName);
+		db.createGoods(goodName, groupName, "smb", 20.2);
+		
+		db.deleteGroup(groupName);
+		LinkedList<Group> l = db.getAllGroups();
+		Assert.assertFalse(consistGroup(l, groupName));
+		LinkedList<Good> list = db.getAllGoods();
+		Assert.assertFalse(consistGood(list, goodName));
+
+		
+	}
+	
+	private boolean consistGroup(LinkedList<Group> l, String groupName) {
+		for(Group g: l) {
+			if(g.getName().equals(groupName)) return true;
 		}
+		return false;
+	}
+	
+	private boolean consistGood(LinkedList<Good> l, String goodName) {
+		for(Good g: l) {
+			if(g.getName().equals(goodName)) return true;
+		}
+		
+		return false;
 	}
 	
 	@Test
-	public void testGenerator() {
-		//App.generateMessages(100000);
+	public void testDatabaseUpdating() {
+		Database db = new Database();
+		String groupName = "UnitTest";
+		String goodName = "Unit";
+		db.deleteGroup(groupName);
+		db.createGroup(groupName);
+		db.createGoods(goodName, groupName, "smb", 20.2);
+		
+		String description = "des";
+		db.updateDescriptionOfGood(goodName, description);
+		String producer = "prod";
+		db.updateProducer(goodName, producer);
+		double price =33.3;
+		db.setPrice(goodName, price);
+		
+		Good g = db.getGood(goodName);
+		
+		Assert.assertEquals(description, g.getDescription());
+		Assert.assertEquals(producer, g.getProducer());
+		Assert.assertTrue(price == g.getPrice());
+
+		db.deleteGroup(groupName);
 	}
+	
+	@Test
+	public void testDatabaseAdditionAndRemoving() {
+		Database db = new Database();
+		String groupName = "UnitTest";
+		String goodName = "Unit";
+		db.deleteGroup(groupName);
+		db.createGroup(groupName);
+		db.createGoods(goodName, groupName, "smb", 20.2);
+		
+		db.addGoods(goodName, 50);
+		Assert.assertEquals(50, db.getQuontityOfGoods(goodName));
+		db.removeGoods(goodName, 50);
+		Assert.assertEquals(0, db.getQuontityOfGoods(goodName));
+		db.removeGoods(goodName, 50);
+		Assert.assertEquals(0, db.getQuontityOfGoods(goodName));
+
+		db.deleteGroup(groupName);
+	}
+	
+	
 
     @Test
     public void testCreator() {
@@ -137,31 +172,6 @@ public class AppTest {
     }
     
     @Test
-    public void testChecker() {
-    	
-    	JsonObject jo = new JsonObject();
-    	jo.addProperty("message", "value");
-    	byte [] bytes = App.createPackage((byte)1, 5, 678, jo);
-    	
-    	PackageChecker pCh = new PackageChecker(bytes, 10);
-    	Assert.assertTrue(pCh.isCorrect());
-    	Assert.assertTrue(pCh.isCorrectDescription());
-    	Assert.assertTrue(pCh.isCorrectContent());
-    	
-    	bytes[0]--;
-    	pCh = new PackageChecker(bytes, 10);
-    	Assert.assertFalse(pCh.isCorrect());
-    	Assert.assertFalse(pCh.isCorrectDescription());
-    	Assert.assertTrue(pCh.isCorrectContent());
-    	
-    	bytes[bytes.length-3]++;
-    	pCh = new PackageChecker(bytes, 10);
-    	Assert.assertFalse(pCh.isCorrect());
-    	Assert.assertFalse(pCh.isCorrectDescription());
-    	Assert.assertFalse(pCh.isCorrectContent());
-    }
-    
-    @Test
     public void testEnlargingNumberOfMessage() {
     	JsonObject jo = new JsonObject();
     	jo.addProperty("message", "value");
@@ -186,7 +196,6 @@ public class AppTest {
     	try {
 			Assert.assertEquals(message, Package.decryptMessage(encrypted));
 		} catch (BadPaddingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     }

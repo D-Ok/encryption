@@ -119,7 +119,12 @@ public class StoreClientTCP implements Runnable {
 			s = new Socket(host, port);
 		} catch (ConnectException e){
 			System.out.println(Thread.currentThread() + " No connection");
-			s= tryToGetConnection(s);
+			try {
+				Thread.sleep(5000);
+				s= tryToGetConnection(s);
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -134,7 +139,7 @@ public class StoreClientTCP implements Runnable {
 		InetAddress addr = InetAddress.getByName(null);
 		String host = addr.getHostAddress();
 		int port = 1050;
-		int numThreads = 1;
+		int numThreads = 1000;
 
 		new StoreClientTCP(host, port, numThreads);
 	}

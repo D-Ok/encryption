@@ -11,6 +11,7 @@ public class Message {
 	private JsonObject jo;
 	
 	private String informationMessage;
+	private long unicNumberOfMessage;
 	
 	public int getcType() {
 		return cType;
@@ -40,24 +41,40 @@ public class Message {
 		else return 0;
 	}
 	
-	public Message(int cType, int userId, JsonElement message){
+	public Message(int cType, int userId, JsonElement message, long unicNumberOfMessage){
 		
 		this.cType = cType;
 		this.userId = userId;
 		
 		this.jo = (JsonObject) message;
 		informationMessage = message.toString();
-		
+		this.unicNumberOfMessage=unicNumberOfMessage;
 	}
 	
-	public Message(int cType, int userId, String someInformation) {
+//	public Message(int cType, int userId, String someInformation) {
+//		this.cType = cType;
+//		this.userId = userId;
+//		informationMessage = someInformation;
+//		
+//		jo = new JsonObject();
+//		jo.addProperty("message", informationMessage);
+//
+//	}
+	
+	public Message(int cType, int userId, String someInformation, long unicNumberOfMessage) {
 		this.cType = cType;
 		this.userId = userId;
 		informationMessage = someInformation;
+		this.unicNumberOfMessage = unicNumberOfMessage;
 		
 		jo = new JsonObject();
 		jo.addProperty("message", informationMessage);
+		jo.addProperty("unicNumber", unicNumberOfMessage);
 
+	}
+
+	public long getUnicNumberOfMessage() {
+		return unicNumberOfMessage;
 	}
 
 	public JsonObject getJsonMessage() {
