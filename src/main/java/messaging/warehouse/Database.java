@@ -59,7 +59,7 @@ public class Database  {
 		}
 	}
 	
-	public void createGoods(String nameOfGoods, String nameOfGroup, String description, String producer, int quontity, double price) throws InvalidCharacteristicOfGoodsException { 
+	public boolean createGoods(String nameOfGoods, String nameOfGroup, String description, String producer, int quontity, double price) throws InvalidCharacteristicOfGoodsException { 
 		if(quontity<0 || price<=0 ) throw new InvalidCharacteristicOfGoodsException("Ucorrect parameters");
 		try {
 	    	PreparedStatement ps = connection.prepareStatement("Insert into `goods` (`name`, `description`, `price`, `quontity`, `producer`, `groupName`) values (?, ?, ?, ?, ?, ?)");
@@ -71,10 +71,13 @@ public class Database  {
 	    	ps.setString(6, nameOfGroup);
 	    	ps.executeUpdate();
 	    	ps.close();
+	    	return true;
     	} catch(SQLIntegrityConstraintViolationException e) {
     		System.out.println("Goods with this name exist.");
+    		return false;
     	} catch (SQLException e) {
 			e.printStackTrace();
+			return false;
 		}
 	}
 	
@@ -109,6 +112,24 @@ public class Database  {
 	    	ps.close();
     	} catch(SQLIntegrityConstraintViolationException e) {
     		System.out.println("Goods with this name exist.");
+    	} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public boolean createGoods(Good g) throws InvalidCharacteristicOfGoodsException {
+		return createGoods(g.getName(), g.getGroupName(),g.getDescription(), g.getProducer(), g.getQuontity() , g.getPrice());
+	}
+	
+	public void createUser(String login, String password) {
+		try {
+	    	PreparedStatement ps = connection.prepareStatement("Insert into `users` (`login`, `password`) values (?, ?)");
+	    	ps.setString(1, login);
+	    	ps.setString(2, password);
+	    	ps.executeUpdate();
+	    	ps.close();
+    	} catch(SQLIntegrityConstraintViolationException e) {
+    		System.out.println("User with this password exist.");
     	} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -153,6 +174,70 @@ public class Database  {
 		return g;
 	}
 	
+	public int getGoodId(String nameOfGood) { 
+		String str ="SELECT * FROM goods WHERE goods.name='"+nameOfGood+"'";
+		Good g = null;
+		int id=-1;
+		try {
+			Statement statement = connection.createStatement();
+	    	ResultSet rs = statement.executeQuery(str);
+	    	if(rs.next()) {
+	    		id =rs.getInt("id");
+	    	}else System.out.println("Good with this name doesn`t exist. ");
+	    	rs.close();
+	    	statement.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return id;
+	}
+	
+	public Good getGoodById(int id) { 
+		String str ="SELECT * FROM goods WHERE goods.id='"+id+"'";
+		Good g = null;
+		try {
+			Statement statement = connection.createStatement();
+	    	ResultSet rs = statement.executeQuery(str);
+	    	if(rs.next()) {
+	    		g = new Good(rs.getString("name"), rs.getString("description"), rs.getString("producer"), rs.getString("groupName"), rs.getDouble("price"), rs.getInt("quontity"));
+	    		g.setId(rs.getInt("id"));
+	    		System.out.println("id = "+rs.getInt("id")+", name : "
+	    	+rs.getString("name")+", description: "+rs.getString("description")+", producer: "+rs.getString("producer")
+	    	+", price: "+rs.getDouble("price")+", quontity: "+rs.getInt("quontity")+", group: "+rs.getString("groupName"));
+	    	}else System.out.println("Good with this name doesn`t exist. ");
+	    	rs.close();
+	    	statement.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return g;
+	}
+	
+	public boolean existUser(String login, String password) { 
+		String str ="SELECT * FROM users WHERE users.login='"+login+"' AND users.password='"+password+"'";
+		Good g = null;
+		try {
+			Statement statement = connection.createStatement();
+	    	ResultSet rs = statement.executeQuery(str);
+	    	if(rs.next()) {
+		    	rs.close();
+		    	statement.close();
+	    		return true;
+	    	}
+	    	else {
+		    	rs.close();
+		    	statement.close();
+	    		return false;
+	    	}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return false;
+	}
+	
 	
 	public void addGoods(String nameOfGood, int quontity){
 		String command = "SELECT * FROM goods WHERE goods.name='"+nameOfGood+"'";
@@ -173,6 +258,45 @@ public class Database  {
 	
 	public void removeGoods(String nameOfGood, int quontity) throws InvalidCharacteristicOfGoodsException{
 		String command = "SELECT * FROM goods WHERE goods.name='"+nameOfGood+"'";
+		try {
+			Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+	    	ResultSet rs = statement.executeQuery(command);
+	    	if(rs.next()) {
+	    		int old = rs.getInt("quontity");
+	    		if(old-quontity>=0) {
+			    	rs.updateInt("quontity", old-quontity);
+			    	rs.updateRow();
+	    		} else {
+	    			rs.close();
+	    			throw new InvalidCharacteristicOfGoodsException("Can`t remove products.");
+	    		}
+	    	}
+	    	rs.close();
+	    	statement.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void addGoodsById(int id, int quontity){
+		String command = "SELECT * FROM goods WHERE goods.id='"+id+"'";
+		try {
+			Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+	    	ResultSet rs = statement.executeQuery(command);
+	    	if(rs.next()) {
+	    		int old = rs.getInt("quontity");
+		    	rs.updateInt("quontity", old+quontity);
+		    	rs.updateRow();
+	    	}
+	    	rs.close();
+	    	statement.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void removeGoodsById(int id, int quontity) throws InvalidCharacteristicOfGoodsException{
+		String command = "SELECT * FROM goods WHERE goods.id='"+id+"'";
 		try {
 			Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
 	    	ResultSet rs = statement.executeQuery(command);
@@ -281,52 +405,97 @@ public class Database  {
 		update(str);
 	}
 	
+	public boolean deleteGoodById(int id) {
+		String str = "delete from goods where id='"+id+"'";
+		return update(str);
+	}
+	
 	public void deleteGroup(String nameOfGroup) {
 		String str = "delete from `groups` where `name`='"+nameOfGroup+"'";
 		update(str);
 	}
 	
-	public void setPrice(String nameOfGood, double price) throws InvalidCharacteristicOfGoodsException{
+	public boolean setPrice(String nameOfGood, double price) throws InvalidCharacteristicOfGoodsException{
 		if(price<=0) throw new InvalidCharacteristicOfGoodsException("Price must be > 0");
 		else {
 			String s = "update `goods` set `price`='"+price+"' where `name`='"+nameOfGood+"'";
-			update(s);
+			return update(s);
 		}
 	}
 	
-	public void updateNameOfGroup(String nameOfGroup, String newNameOfGroup) {
+	public boolean updateNameOfGroup(String nameOfGroup, String newNameOfGroup) {
 		String s = "update `groups` set `name`='"+newNameOfGroup+"' where `name`='"+nameOfGroup+"'";
-		update(s);
+		return update(s);
 	}
 	
-	public void updateNameOfGood(String nameOfGood, String newNameOfGood) {
+	public boolean updateNameOfGood(String nameOfGood, String newNameOfGood) {
 		String s = "update `goods` set `name`='"+newNameOfGood+"' where `name`='"+nameOfGood+"'";
-		update(s);
+		return update(s);
 	}
 	
-	public void updateDescriptionOfGroup(String groupName, String description) {
+	public boolean updateNameOfGroupInGood(String nameOfGood, String newNameOfGroup) {
+		String s = "update `goods` set `groupName`='"+newNameOfGroup+"' where `name`='"+nameOfGood+"'";
+		return update(s);
+	}
+	
+	public boolean updateDescriptionOfGroup(String groupName, String description) {
 		String s = "update `groups` set `description`='"+description+"' where `name`='"+groupName+"'";
-		update(s);
+		return update(s);
 	}
     
-	public void updateDescriptionOfGood(String nameOfGood, String description) {
+	public boolean updateDescriptionOfGood(String nameOfGood, String description) {
 		String s = "update `goods` set `description`='"+description+"' where `name`='"+nameOfGood+"'";
-		update(s);
+		return update(s);
 	}
 	
-	public void updateProducer(String nameOfGood, String producer) {
+	public boolean updateProducer(String nameOfGood, String producer) {
 			String s = "update `goods` set `producer`='"+producer+"' where `name`='"+nameOfGood+"'";
-			update(s);
+			return update(s);
+	}
+	
+	public boolean setPrice(int goodId, double price) throws InvalidCharacteristicOfGoodsException{
+		if(price<=0) throw new InvalidCharacteristicOfGoodsException("Price must be > 0");
+		else {
+			String s = "update `goods` set `price`='"+price+"' where `id`='"+goodId+"'";
+			return update(s);
+		}
+	}
+
+	public boolean updateNameOfGood(int goodId, String newNameOfGood) {
+		String s = "update `goods` set `name`='"+newNameOfGood+"' where `id`='"+goodId+"'";
+		return update(s);
+	}
+	
+	public boolean updateNameOfGroupInGood(int goodId, String newNameOfGroup) {
+		String s = "update `goods` set `groupName`='"+newNameOfGroup+"' where `id`='"+goodId+"'";
+		return update(s);
+	}
+	
+	public boolean updateDescriptionOfGroup(int goodId, String description) {
+		String s = "update `groups` set `description`='"+description+"' where `id`='"+goodId+"'";
+		return update(s);
+	}
+    
+	public boolean updateDescriptionOfGood(int goodId, String description) {
+		String s = "update `goods` set `description`='"+description+"' where `id`='"+goodId+"'";
+		return update(s);
+	}
+	
+	public boolean updateProducer(int goodId, String producer) {
+			String s = "update `goods` set `producer`='"+producer+"' where `id`='"+goodId+"'";
+			return update(s);
 	}
 	
 	
-	private void update(String command) {
+	private boolean update(String command) {
 		try {
 			Statement st = connection.createStatement();
 			st.executeUpdate(command);
 			st.close();
+			return true;
 		} catch (SQLException e) {
 			System.out.println("Uncorrect data.");
+			return false;
 		}
 	}
 	
@@ -396,6 +565,14 @@ public class Database  {
 				+ "UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE, "
 				+ "UNIQUE INDEX `name_UNIQUE` (`name` ASC) VISIBLE);";
 		
+		String usersTable = "create table if not exists `users`"
+				+ " (`id` INT NOT NULL AUTO_INCREMENT, "
+				+ "`login` VARCHAR(45) NOT NULL, "
+				+ "`password` VARCHAR(1000) NOT NULL, "
+				+ "PRIMARY KEY (`id`, `password`), "
+				+ "UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE, "
+				+ "UNIQUE INDEX `password_UNIQUE` (`password` ASC) VISIBLE);";
+		
 		 PreparedStatement st;
 		 
 		try {
@@ -403,6 +580,9 @@ public class Database  {
 			st.executeUpdate();
 			
 			st = connection.prepareStatement(goodsTable);
+	        st.executeUpdate();
+	        
+	        st = connection.prepareStatement(usersTable);
 	        st.executeUpdate();
 	        
 	        st.close();

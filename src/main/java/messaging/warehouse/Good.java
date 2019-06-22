@@ -2,12 +2,17 @@ package messaging.warehouse;
 
 public class Good {
 
+	private int id;
 	private String name;
 	private String description;
 	private String producer;
 	private String groupName;
 	private double price;
 	private int quontity;
+	
+	public Good() {
+		
+	}
 	
 	public Good(String name, String description, String producer, String groupName, double price, int quontity) {
 		this.name = name;
@@ -16,6 +21,14 @@ public class Good {
 		this.groupName = groupName;
 		this.price = price;
 		this.quontity = quontity;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public String getName() {
