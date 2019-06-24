@@ -23,16 +23,19 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.Executors;
 
 import javax.crypto.SecretKey;
 
 public class ServerHttp {
 
-	private static SecretKey key;
+	private static final SecretKey key = MacProvider.generateKey(SignatureAlgorithm.HS256);
 	private static final Database db = new Database();
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	private volatile static int unicNumber = 0;
@@ -40,24 +43,28 @@ public class ServerHttp {
 
 	public static void main(String[] args) throws Exception {
 
-		db.createUser("login", "password");
-		db.createUser("Kate", "12345");
+ 	    db.createGroup("dairy", "products with milk");
+ 	    db.createGroup("groats", "description");
+		db.createUser("login", getMD5EncryptedValue("password"));
+		db.createUser("Kate", getMD5EncryptedValue("12345"));
+ 	   db.createGoods("milk", "dairy", "milk product", "Kyiv", 600, 23.9);
+	   db.createGoods("cheese", "dairy", "milk product", "Poltava", 780, 44);
+ 	   db.createGoods("butter", "dairy", "milk product", "Chernihiv", 450, 43.5);
+ 	   
+ 	   db.createGoods("buckwheat", "groats", "description", "Kyiv", 1000, 25.5);
+ 	   db.createGoods("fig", "groats", "description", "Chernihiv", 1500, 33);
+ 	   db.createGoods("bulgur", "groats", "description", "Kyiv", 800, 40);
 
-		key = MacProvider.generateKey(SignatureAlgorithm.HS256);
-
-		// apiKey = "SecretKey".getBytes("UTF-8");
+		
 		HttpServer server = HttpServer.create();
 		server.bind(new InetSocketAddress(8765), 0);
 
 		HttpContext context = server.createContext("/api/login", new LoginHandler());
 
-//		HttpContext context1 = server.createContext("/api/good", new ChangeGoodHandler());
-//		context1.setAuthenticator(new Auth());
-
 		HttpContext context2 = server.createContext("/api/good", new GoodHandler());
 		context2.setAuthenticator(new Auth());
 
-		server.setExecutor(null);
+		server.setExecutor(Executors.newFixedThreadPool(5));
 		server.start();
 	}
 
@@ -129,7 +136,8 @@ public class ServerHttp {
 					login = params.get("login");
 				if (params.containsKey("password"))
 					password = params.get("password");
-				System.out.println("login = " + login + " password = " + password);
+				
+				System.out.println("GET: login = " + login + " password = " + password);
 				if (db.existUser(login, password)) {
 					String token = createJWT(" " + unicNumber, login);
 					unicNumber++;
@@ -164,12 +172,16 @@ public class ServerHttp {
 			StringBuilder builder = new StringBuilder();
 
 			if (exchange.getRequestMethod().equals("POST")) {
+				System.out.println("POST");
 				goodChange(exchange);
 			} else if (exchange.getRequestMethod().equals("PUT")) {
+				System.out.println("PUT");
 				goodCreate(exchange);
 			} else if (exchange.getRequestMethod().equals("DELETE")) {
+				System.out.println("DELETE");
 				goodDelete(exchange);
 			} else if (exchange.getRequestMethod().equals("GET")) {
+				System.out.println("GET");
 				goodInfo(exchange);
 			} else
 				throw new UnsupportedOperationException();
@@ -185,6 +197,7 @@ public class ServerHttp {
 			int idOfGood = Integer.valueOf(id);
 			Good good = db.getGoodById(idOfGood);
 			if (good != null) {
+				System.out.println("send information to client about: "+good);
 				String b = GSON.toJson(good);
 				byte[] body = b.getBytes("UTF-8");
 
@@ -205,11 +218,18 @@ public class ServerHttp {
 			String id = uriParths[uriParths.length - 1];
 
 			int idOfGood = Integer.valueOf(id);
-
-			if (db.deleteGoodById(idOfGood)) {
-				exchange.sendResponseHeaders(204, -1);
-			} else
-				exchange.sendResponseHeaders(404, -1);
+			
+			Good g = db.getGoodById(idOfGood);
+			
+			if(g==null) exchange.sendResponseHeaders(404, -1);
+			else 
+			{
+				if (db.deleteGoodById(idOfGood)) {
+					System.out.println("deleted");
+					exchange.sendResponseHeaders(204, -1);
+				} else
+					exchange.sendResponseHeaders(404, -1);
+			}
 		}
 
 		// put
@@ -220,7 +240,7 @@ public class ServerHttp {
 			try {
 				Good goodToCreate = GSON.fromJson(new String(is.readAllBytes()), Good.class);
 				if (db.createGoods(goodToCreate)) {
-
+					System.out.println("Created good: "+goodToCreate);
 					int id = db.getGoodId(goodToCreate.getName());
 					JsonObject jo = new JsonObject();
 					jo.addProperty("id", id);
@@ -246,13 +266,13 @@ public class ServerHttp {
 
 			try {
 				JsonObject jo = GSON.fromJson(new String(is.readAllBytes()), JsonObject.class);
-				System.out.println("here");
 				if(jo.has("id")) {
 					int id = jo.get("id").getAsInt();
 					Good g = db.getGoodById(id);
 					
 					if(g==null) exchange.sendResponseHeaders(404, -1);
 					else {
+						System.out.println("Good before changes: "+db.getGoodById(id));
 						if(jo.has("price"))
 							try {
 								db.setPrice(id, jo.get("price").getAsDouble());
@@ -271,7 +291,7 @@ public class ServerHttp {
 							} catch (InvalidCharacteristicOfGoodsException e) {
 								exchange.sendResponseHeaders(409, -1);
 							}
-							
+						System.out.println("Chenged good: "+db.getGoodById(id));	
 						exchange.sendResponseHeaders(204, -1);
 					}
 				} else 
@@ -297,5 +317,27 @@ public class ServerHttp {
 				return new Failure(403);
 		}
 	}
+	
+	public static String getMD5EncryptedValue(String password) {
+        final byte[] defaultBytes = password.getBytes();
+        try {
+            final MessageDigest md5MsgDigest = MessageDigest.getInstance("MD5");
+            md5MsgDigest.reset();
+            md5MsgDigest.update(defaultBytes);
+            final byte messageDigest[] = md5MsgDigest.digest();
+            final StringBuffer hexString = new StringBuffer();
+            for (final byte element : messageDigest) {
+                final String hex = Integer.toHexString(0xFF & element);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+            password = hexString + "";
+        } catch (final NoSuchAlgorithmException nsae) {
+            nsae.printStackTrace();
+        }
+        return password;
+    }
 
 }

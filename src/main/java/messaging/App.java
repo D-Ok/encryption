@@ -1,5 +1,6 @@
 package messaging;
  
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService; 
 import java.util.concurrent.Executors;
 
@@ -11,12 +12,24 @@ import com.google.gson.JsonObject;
 import messaging.exceptions.ArgumentException;
 import messaging.exceptions.InjuredPackageException;
 import messaging.exceptions.NoMessageException;
+import messaging.network.ClientHttp;
 
 public class App {
 	
 	private volatile static Receiver r = new Receiver();
 		   	  public static void main(String[] args) {
-		   		 // generateMessages(100000);
+		   		 HashMap<String, String> users = new HashMap<String, String>();
+		         users.put("login", "password");
+		         users.put("Kate","12345");
+		         
+		 			Thread cli;
+		 				cli = new Thread(new ClientHttp("login", "wrong"));
+		 				cli.run();
+		 				cli = new Thread(new ClientHttp("login", users.get("login")));
+		 				cli.run();
+		 				cli = new Thread(new ClientHttp("Kate", users.get("Kate")));
+		 				cli.run();
+		         
 		   		  
 		   	  }
 		   	  
